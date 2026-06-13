@@ -59,6 +59,11 @@
 /* ==========================================================================
    BASE STYLES & FULL SCREEN CONFIGURATION
    ========================================================================== */
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -110,10 +115,6 @@ table {
 }
 
 .btn-menu-toggle.active {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 101;
     background-color: var(--primary);
     color: white;
     border-color: var(--primary);
@@ -226,6 +227,7 @@ body {
 }
 
 .app-container {
+    position: relative;
     width: 100%;
     max-width: 100%;
     min-height: calc(100vh - 24px);
@@ -637,13 +639,13 @@ body {
     z-index: 6;
 }
 
-.timetable-grid.horizontal .day-header-mon { grid-row: 2; grid-column: 1; border-left: 5px solid var(--color-mon); }
-.timetable-grid.horizontal .day-header-tue { grid-row: 3; grid-column: 1; border-left: 5px solid var(--color-tue); }
-.timetable-grid.horizontal .day-header-wed { grid-row: 4; grid-column: 1; border-left: 5px solid var(--color-wed); }
-.timetable-grid.horizontal .day-header-thu { grid-row: 5; grid-column: 1; border-left: 5px solid var(--color-thu); }
-.timetable-grid.horizontal .day-header-fri { grid-row: 6; grid-column: 1; border-left: 5px solid var(--color-fri); }
-.timetable-grid.horizontal .day-header-sat { grid-row: 7; grid-column: 1; border-left: 5px solid var(--color-sat); }
-.timetable-grid.horizontal .day-header-sun { grid-row: 8; grid-column: 1; border-left: 5px solid var(--color-sun); }
+.timetable-grid.horizontal .day-header-mon { grid-row: 2; grid-column: 1; border-left: 1px solid var(--border-color); background-color: rgba(2, 132, 199, 0.08) !important; color: var(--color-mon) !important; }
+.timetable-grid.horizontal .day-header-tue { grid-row: 3; grid-column: 1; border-left: 1px solid var(--border-color); background-color: rgba(219, 39, 119, 0.08) !important; color: var(--color-tue) !important; }
+.timetable-grid.horizontal .day-header-wed { grid-row: 4; grid-column: 1; border-left: 1px solid var(--border-color); background-color: rgba(5, 150, 105, 0.08) !important; color: var(--color-wed) !important; }
+.timetable-grid.horizontal .day-header-thu { grid-row: 5; grid-column: 1; border-left: 1px solid var(--border-color); background-color: rgba(234, 88, 12, 0.08) !important; color: var(--color-thu) !important; }
+.timetable-grid.horizontal .day-header-fri { grid-row: 6; grid-column: 1; border-left: 1px solid var(--border-color); background-color: rgba(8, 145, 178, 0.08) !important; color: var(--color-fri) !important; }
+.timetable-grid.horizontal .day-header-sat { grid-row: 7; grid-column: 1; border-left: 1px solid var(--border-color); background-color: rgba(124, 58, 237, 0.08) !important; color: var(--color-sat) !important; }
+.timetable-grid.horizontal .day-header-sun { grid-row: 8; grid-column: 1; border-left: 1px solid var(--border-color); background-color: rgba(220, 38, 38, 0.08) !important; color: var(--color-sun) !important; }
 
 /* แกนเวลาแนวนอนด้านบน */
 .timetable-grid.horizontal .time-axis-cell {
@@ -706,13 +708,13 @@ body {
     color: var(--text-muted);
 }
 
-.timetable-grid.vertical .day-header-mon { grid-column: 2; grid-row: 1; border-top: 5px solid var(--color-mon); border-left: none; }
-.timetable-grid.vertical .day-header-tue { grid-column: 3; grid-row: 1; border-top: 5px solid var(--color-tue); border-left: none; }
-.timetable-grid.vertical .day-header-wed { grid-column: 4; grid-row: 1; border-top: 5px solid var(--color-wed); border-left: none; }
-.timetable-grid.vertical .day-header-thu { grid-column: 5; grid-row: 1; border-top: 5px solid var(--color-thu); border-left: none; }
-.timetable-grid.vertical .day-header-fri { grid-column: 6; grid-row: 1; border-top: 5px solid var(--color-fri); border-left: none; }
-.timetable-grid.vertical .day-header-sat { grid-column: 7; grid-row: 1; border-top: 5px solid var(--color-sat); border-left: none; }
-.timetable-grid.vertical .day-header-sun { grid-column: 8; grid-row: 1; border-top: 5px solid var(--color-sun); border-left: none; }
+.timetable-grid.vertical .day-header-mon { grid-column: 2; grid-row: 1; border-top: 1px solid var(--border-color); border-left: none; background-color: rgba(2, 132, 199, 0.08) !important; color: var(--color-mon) !important; }
+.timetable-grid.vertical .day-header-tue { grid-column: 3; grid-row: 1; border-top: 1px solid var(--border-color); border-left: none; background-color: rgba(219, 39, 119, 0.08) !important; color: var(--color-tue) !important; }
+.timetable-grid.vertical .day-header-wed { grid-column: 4; grid-row: 1; border-top: 1px solid var(--border-color); border-left: none; background-color: rgba(5, 150, 105, 0.08) !important; color: var(--color-wed) !important; }
+.timetable-grid.vertical .day-header-thu { grid-column: 5; grid-row: 1; border-top: 1px solid var(--border-color); border-left: none; background-color: rgba(234, 88, 12, 0.08) !important; color: var(--color-thu) !important; }
+.timetable-grid.vertical .day-header-fri { grid-column: 6; grid-row: 1; border-top: 1px solid var(--border-color); border-left: none; background-color: rgba(8, 145, 178, 0.08) !important; color: var(--color-fri) !important; }
+.timetable-grid.vertical .day-header-sat { grid-column: 7; grid-row: 1; border-top: 1px solid var(--border-color); border-left: none; background-color: rgba(124, 58, 237, 0.08) !important; color: var(--color-sat) !important; }
+.timetable-grid.vertical .day-header-sun { grid-column: 8; grid-row: 1; border-top: 1px solid var(--border-color); border-left: none; background-color: rgba(220, 38, 38, 0.08) !important; color: var(--color-sun) !important; }
 
 /* แกนเวลาแนวตั้งด้านซ้าย */
 .timetable-grid.vertical .time-axis-cell {
@@ -1297,11 +1299,17 @@ input:focus, select:focus {
 @media (max-width: 1024px) {
     body {
         padding: 8px;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-y: auto;
     }
     
     .app-container {
         padding: 12px;
         min-height: calc(100vh - 16px);
+        min-height: calc(100dvh - 16px);
+        height: auto;
+        overflow: visible;
     }
     
     .app-title {
@@ -1310,6 +1318,10 @@ input:focus, select:focus {
 
     .btn-menu-toggle {
         display: flex;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 101; /* Locked fixed positioning to prevent jumping */
     }
 
     /* ซ่อนแถบควบคุมธรรมดาแล้วแปลงเป็น Navigation Drawer */
@@ -1371,10 +1383,74 @@ input:focus, select:focus {
     .customizer-drawer.open {
         right: 0;
     }
+
+    /* จัดสัดส่วนส่วนหัวส่งออกในรูปภาพ */
+    .capture-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+    .capture-info-section {
+        text-align: center;
+    }
+    .capture-footer {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        align-items: center;
+    }
+
+    /* ปรับแต่งความกว้างและขนาดตารางแนวตั้งสำหรับหน้าจอแท็บเล็ต/iPad ในแนวตั้ง */
+    .timetable-grid.vertical {
+        grid-template-columns: 70px repeat(7, minmax(90px, 1fr)) !important;
+        grid-template-rows: 45px repeat(24, 38px) !important;
+        min-width: 100% !important;
+    }
+    .subject-card {
+        padding: 6px 8px;
+        margin: 2px 3px;
+        gap: 3px;
+    }
+    .card-time {
+        font-size: 0.7rem;
+        padding: 1px 4px;
+    }
+    .card-code-badge {
+        font-size: 0.7rem;
+        max-width: 100%;
+        padding: 1px 4px;
+    }
+    .card-name {
+        font-size: 0.78rem;
+    }
+    .card-details {
+        font-size: 0.65rem;
+        gap: 2px;
+    }
 }
 
 /* 2. เฉพาะมือถือขนาดเล็ก (Mobile: <= 767px) */
 @media (max-width: 767px) {
+    body {
+        padding: 8px;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-y: auto;
+    }
+
+    .app-container {
+        padding: 14px 12px;
+        min-height: calc(100vh - 16px);
+        min-height: calc(100dvh - 16px);
+        height: auto;
+        overflow: visible;
+    }
+
+    .today-planner {
+        padding: 16px;
+    }
+
     .mobile-day-selector {
         display: flex;
     }
@@ -1437,6 +1513,37 @@ input:focus, select:focus {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
+        padding-right: 50px; /* เว้นที่ให้ปุ่ม Hamburger ด้านขวาบน */
+    }
+    
+    .logo-area {
+        gap: 8px;
+        max-width: 100%;
+    }
+    .logo-icon-wrapper {
+        width: 38px;
+        height: 38px;
+    }
+    .logo-svg {
+        width: 18px;
+        height: 18px;
+    }
+    .app-title {
+        font-size: 1.25rem;
+    }
+    .app-subtitle {
+        font-size: 0.75rem;
+    }
+
+    .datetime-wrapper {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .datetime-display {
+        width: 100%;
+        font-size: 0.82rem;
+        padding: 6px 12px;
+        text-align: center;
     }
 
     .btn-floating {
@@ -1448,14 +1555,27 @@ input:focus, select:focus {
     .modal {
         align-items: flex-end;
         padding: 0;
+        overflow-y: auto;
     }
 
     .modal-content {
         max-width: 100%;
+        max-height: 85vh;
+        max-height: 85dvh;
+        display: flex;
+        flex-direction: column;
         border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
         border: none;
         border-top: 1px solid #cbd5e1;
         transform: translateY(100%);
+    }
+
+    .modal-form {
+        overflow-y: auto;
+    }
+
+    .calendar-modal-content {
+        max-width: 100% !important;
     }
 
     .modal.show .modal-content {
@@ -1465,6 +1585,23 @@ input:focus, select:focus {
     .customizer-drawer {
         width: 100%;
         right: -100%;
+    }
+
+    .subject-card {
+        padding: 8px 10px;
+    }
+    .card-time {
+        font-size: 0.72rem;
+    }
+    .card-code-badge {
+        font-size: 0.72rem;
+        max-width: 70px;
+    }
+    .card-name {
+        font-size: 0.8rem;
+    }
+    .card-details {
+        font-size: 0.68rem;
     }
 }
 
@@ -1477,9 +1614,9 @@ input:focus, select:focus {
     }
     
     .timetable-grid.vertical {
-        grid-template-columns: 75px repeat(7, minmax(130px, 1fr)) !important;
+        grid-template-columns: 70px repeat(7, minmax(90px, 1fr)) !important;
         grid-template-rows: 45px repeat(24, 38px) !important;
-        min-width: 980px !important;
+        min-width: 100% !important;
     }
     
     .subject-card {
@@ -2045,6 +2182,14 @@ body.has-custom-bg .aurora-blob {
     }
     .calendar-option-card {
         padding: 16px;
+    }
+}
+
+/* ปรับรูปแบบฟอร์มให้ซ้อนกันแนวตั้งสำหรับหน้าจอมือถือขนาดเล็ก */
+@media (max-width: 500px) {
+    .form-group-row {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
     }
 }
 

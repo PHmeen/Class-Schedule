@@ -420,7 +420,7 @@ function renderTodayView() {
         todaySubjects.forEach(sub => {
             const row = document.createElement('div');
             row.className = `today-subject-row`;
-            row.style.borderLeft = `4px solid var(--subject-${sub.color}-border)`;
+            row.style.border = `1px solid var(--subject-${sub.color}-border)`;
             row.style.backgroundColor = `var(--subject-${sub.color})`;
             row.style.color = `var(--subject-${sub.color}-dark)`;
             
