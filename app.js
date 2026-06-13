@@ -969,6 +969,99 @@ function copyWidgetShareLink() {
     }
 }
 
+// ส่งออกปฏิทินในรูปแบบไฟล์ .ics ที่สามารถนำเข้า Apple Calendar/Google Calendar ได้โดยตรง
+function exportToICS() {
+    const activeSch = getActiveSchedule();
+    if (!activeSch || activeSch.subjects.length === 0) {
+        showToast('⚠️ ไม่มีข้อมูลวิชาเรียนที่สามารถส่งออกปฏิทินได้');
+        return;
+    }
+
+    const daysMap = {
+        'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
+        'Thursday': 4, 'Friday': 5, 'Saturday': 6
+    };
+    
+    const icsDays = {
+        'Monday': 'MO', 'Tuesday': 'TU', 'Wednesday': 'WE',
+        'Thursday': 'TH', 'Friday': 'FR', 'Saturday': 'SA', 'Sunday': 'SU'
+    };
+
+    function getNextWeekdayDate(dayName) {
+        const targetDay = daysMap[dayName];
+        const resultDate = new Date();
+        const currentDay = resultDate.getDay();
+        let distance = targetDay - currentDay;
+        if (distance < 0) {
+            distance += 7; // ไปยังวันของสัปดาห์หน้า
+        }
+        resultDate.setDate(resultDate.getDate() + distance);
+        return resultDate;
+    }
+
+    function formatICSDate(date, timeStr) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        const [h, m] = timeStr.split(':');
+        return `${yyyy}${mm}${dd}T${h}${m}00`;
+    }
+
+    // กำหนดวันสิ้นสุดการเรียนซ้ำ (ค่าเริ่มต้นคืออีก 5 เดือนนับจากปัจจุบัน)
+    const untilDate = new Date();
+    untilDate.setMonth(untilDate.getMonth() + 5);
+    const untilStr = untilDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+    const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+    let icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//PHATHIT MEEN//Academic Timetable//TH',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH'
+    ].join('\r\n') + '\r\n';
+
+    activeSch.subjects.forEach(sub => {
+        const startDayDate = getNextWeekdayDate(sub.day);
+        const startDateTime = formatICSDate(startDayDate, sub.startTime);
+        const endDateTime = formatICSDate(startDayDate, sub.endTime);
+        const icsDay = icsDays[sub.day] || 'MO';
+
+        icsContent += [
+            'BEGIN:VEVENT',
+            `UID:${sub.id}-${Date.now()}@timetable`,
+            `DTSTAMP:${nowStr}`,
+            `SUMMARY:${sub.subjectCode} ${sub.subjectName}`,
+            `DTSTART;TZID=Asia/Bangkok:${startDateTime}`,
+            `DTEND;TZID=Asia/Bangkok:${endDateTime}`,
+            `RRULE:FREQ=WEEKLY;UNTIL=${untilStr};BYDAY=${icsDay}`,
+            `LOCATION:${sub.room || 'ไม่ระบุห้องเรียน'}`,
+            `DESCRIPTION:อาจารย์ผู้สอน: ${sub.teacher || 'ไม่ระบุอาจารย์'}`,
+            'END:VEVENT'
+        ].join('\r\n') + '\r\n';
+    });
+
+    icsContent += 'END:VCALENDAR';
+
+    try {
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        
+        const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
+        link.setAttribute('download', `${schName}_calendar.ics`);
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('📅 ส่งออกไฟล์ปฏิทิน (.ics) สำเร็จแล้ว! ดับเบิลคลิกไฟล์เพื่อบันทึกเข้าปฏิทิน');
+    } catch (e) {
+        console.error(e);
+        showToast('⚠️ ส่งออกปฏิทินล้มเหลว');
+    }
+}
+
 function handleImport(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -1081,6 +1174,11 @@ function setupEventListeners() {
     const btnShareLink = document.getElementById('btn-share-link');
     if (btnShareLink) {
         btnShareLink.addEventListener('click', copyWidgetShareLink);
+    }
+    
+    const btnExportICS = document.getElementById('btn-export-ics');
+    if (btnExportICS) {
+        btnExportICS.addEventListener('click', exportToICS);
     }
     
     const importTrigger = document.getElementById('btn-import-trigger');
