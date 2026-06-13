@@ -1295,8 +1295,8 @@ input:focus, select:focus {
    RESPONSIVE DESIGN (มือถือ/แท็บเล็ต/เดสก์ท็อป)
    ========================================================================== */
 
-/* 1. อุปกรณ์ขนาดเล็กและแท็บเล็ต (Mobile & Tablet: <= 1024px) */
-@media (max-width: 1024px) {
+/* 1. อุปกรณ์ขนาดเล็ก (Mobile: <= 767px) */
+@media (max-width: 767px) {
     body {
         padding: 8px;
         min-height: 100vh;
@@ -1605,8 +1605,45 @@ input:focus, select:focus {
     }
 }
 
-/* 3. แท็บเล็ตโหมดแนวนอน (Tablet Landscape: 769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
+/* 3. แท็บเล็ตและหน้าจอระดับกลาง (Tablets: 768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .header-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+    }
+    
+    .schedule-management {
+        flex: 1 1 100%;
+        justify-content: flex-start;
+    }
+    
+    .view-toggles {
+        flex: 1 1 auto;
+    }
+
+    #btn-open-customizer, #btn-toggle-orientation {
+        flex: 0 1 auto;
+        min-width: 170px;
+    }
+
+    .backup-controls {
+        flex: 1 1 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        border-top: 1px dashed #cbd5e1;
+        padding-top: 12px;
+        margin-top: 4px;
+    }
+
+    .backup-controls button {
+        width: 100%;
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+
     .timetable-grid.horizontal {
         grid-template-columns: 85px repeat(24, minmax(50px, 1fr)) !important;
         grid-template-rows: 45px repeat(7, minmax(75px, auto)) !important;

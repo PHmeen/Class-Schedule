@@ -1001,7 +1001,7 @@ function formatICSDate(date, timeStr) {
 }
 
 // ส่งออกปฏิทินในรูปแบบไฟล์ .ics ที่สามารถนำเข้า Apple Calendar/Google Calendar ได้โดยตรง
-function exportToICS() {
+function exportToICS(target = 'local', newWindow = null) {
     const activeSch = getActiveSchedule();
     if (!activeSch || activeSch.subjects.length === 0) {
         showToast('⚠️ ไม่มีข้อมูลวิชาเรียนที่สามารถส่งออกปฏิทินได้');
@@ -1057,7 +1057,7 @@ function exportToICS() {
 
     try {
         const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
-        triggerICSDownload(icsContent, `${schName}_calendar.ics`, true, target);
+        triggerICSDownload(icsContent, `${schName}_calendar.ics`, true, target, newWindow);
     } catch (e) {
         console.error(e);
         showToast('⚠️ ส่งออกปฏิทินล้มเหลว');
@@ -1111,10 +1111,11 @@ function closeCalendarModal() {
 window.closeCalendarModal = closeCalendarModal;
 
 // ฟังก์ชันช่วยเหลือดาวน์โหลดและแจ้งเตือนตามสภาวะระบบปฏิบัติการ (แก้ไขข้อจำกัด iOS PWA / Safari Popup Blocker)
-function triggerICSDownload(icsContent, fileName, isExport, target = 'local') {
+function triggerICSDownload(icsContent, fileName, isExport, target = 'local', newWindow = null) {
     const isStandalone = (window.navigator.standalone) || (window.matchMedia('(display-mode: standalone)').matches);
     
     if (isStandalone) {
+        if (newWindow) newWindow.close();
         alert('⚠️ ข้อจำกัดของ iOS/iPadOS (แอปบนหน้าจอโฮม):\n\n' +
               'การกดเปิดแอปผ่านหน้าจอโฮมจะไม่รองรับการดาวน์โหลดไฟล์ลงเครื่องตรงๆ ครับ\n\n' +
               'วิธีแก้ไข:\n' +
@@ -1123,6 +1124,20 @@ function triggerICSDownload(icsContent, fileName, isExport, target = 'local') {
     }
 
     try {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        if (isIOS && target === 'local') {
+            if (newWindow) newWindow.close();
+            window.location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
+            if (isExport) {
+                showToast('📅 กำลังเชื่อมต่อกับปฏิทินในเครื่อง...');
+            } else {
+                showToast('🗑️ กำลังยกเลิกวิชาเรียนในปฏิทิน...');
+            }
+            return;
+        }
+
         const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -1135,8 +1150,13 @@ function triggerICSDownload(icsContent, fileName, isExport, target = 'local') {
         if (isExport) {
             showToast('📅 ส่งออกไฟล์ปฏิทิน (.ics) สำเร็จแล้ว!');
             if (target === 'google') {
-                window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+                if (newWindow) {
+                    newWindow.location.href = 'https://calendar.google.com/calendar/r/settings/export';
+                } else {
+                    window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+                }
             } else {
+                if (newWindow) newWindow.close();
                 alert('💡 ข้อแนะนำสำคัญสำหรับ iPad/iPhone:\n\n' +
                       '1. ตอนเปิดไฟล์เพื่อเพิ่มปฏิทิน ให้เลือก "สร้างปฏิทินใหม่" (เช่น ตั้งชื่อว่า "ตารางเรียน")\n' +
                       '2. หากต้องการลบวิชาเรียนทั้งหมดในภายหลัง คุณสามารถเข้าไปสั่ง "ลบปฏิทิน" นั้นทิ้งได้ทันทีในคลิกเดียวครับ');
@@ -1144,19 +1164,25 @@ function triggerICSDownload(icsContent, fileName, isExport, target = 'local') {
         } else {
             showToast('🗑️ ดาวน์โหลดไฟล์ยกเลิกปฏิทินสำเร็จ!');
             if (target === 'google') {
-                window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+                if (newWindow) {
+                    newWindow.location.href = 'https://calendar.google.com/calendar/r/settings/export';
+                } else {
+                    window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+                }
             } else {
+                if (newWindow) newWindow.close();
                 alert('💡 เคล็ดลับ:\n\nเมื่อดาวน์โหลดไฟล์ยกเลิกแล้ว ดับเบิลคลิกเปิดไฟล์เพื่อกดลบวิชาออกจากปฏิทินเครื่องได้เลยครับ');
             }
         }
     } catch (e) {
+        if (newWindow) newWindow.close();
         console.error(e);
         showToast('⚠️ ดำเนินการเกี่ยวกับปฏิทินล้มเหลว');
     }
 }
 
 // ลบรายวิชาเรียนออกจาก Apple Calendar / Google Calendar ผ่านไฟล์ .ics
-function cancelToICS(target = 'local') {
+function cancelToICS(target = 'local', newWindow = null) {
     const activeSch = getActiveSchedule();
     if (!activeSch || activeSch.subjects.length === 0) {
         showToast('⚠️ ไม่มีข้อมูลวิชาเรียนที่จะลบ');
@@ -1202,7 +1228,7 @@ function cancelToICS(target = 'local') {
 
     try {
         const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
-        triggerICSDownload(icsContent, `ลบ_${schName}_calendar.ics`, false, target);
+        triggerICSDownload(icsContent, `ลบ_${schName}_calendar.ics`, false, target, newWindow);
     } catch (e) {
         console.error(e);
         showToast('⚠️ สร้างไฟล์ลบปฏิทินล้มเหลว');
@@ -1360,10 +1386,11 @@ function setupEventListeners() {
     const btnCalGoogleAction = document.getElementById('btn-cal-google-action');
     if (btnCalGoogleAction) {
         btnCalGoogleAction.addEventListener('click', () => {
+            const newWindow = window.open('about:blank', '_blank');
             if (calendarActionType === 'export') {
-                exportToICS('google');
+                exportToICS('google', newWindow);
             } else {
-                cancelToICS('google');
+                cancelToICS('google', newWindow);
             }
             closeCalendarModal();
         });
