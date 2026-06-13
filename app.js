@@ -1122,14 +1122,16 @@ function triggerICSDownload(icsContent, fileName, isExport, target = 'local', ne
               'กรุณาเปิดหน้าเว็บนี้ผ่านแอปเบราว์เซอร์ Safari (https://phmeen.github.io/Class-Schedule/) แล้วกดทำรายการส่งออกหรือลบปฏิทินอีกครั้งครับ');
         return;
     }
-
     try {
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+        const blobUrl = URL.createObjectURL(blob);
+
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
         if (isIOS && target === 'local') {
             if (newWindow) newWindow.close();
-            window.location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
+            window.location.href = blobUrl;
             if (isExport) {
                 showToast('📅 กำลังเชื่อมต่อกับปฏิทินในเครื่อง...');
             } else {
@@ -1138,9 +1140,8 @@ function triggerICSDownload(icsContent, fileName, isExport, target = 'local', ne
             return;
         }
 
-        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
+        link.href = blobUrl;
         link.setAttribute('download', fileName);
         
         document.body.appendChild(link);
