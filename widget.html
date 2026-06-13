@@ -12,6 +12,14 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Chonburi&family=Mitr:wght@300;400;500;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=1.5">
+    <!-- PWA & iOS Safari Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Timetable">
+    <!-- html2canvas ไลบรารีสำหรับเซฟหน้าเว็บเป็นรูปภาพ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Scale up the entire UI proportionally by increasing the root font-size (since layout uses rem units) */
         html {
@@ -108,52 +116,104 @@
 
             </div>
 
-            <!-- ส่วนควบคุมระบบ (จะถูกซ่อนไว้ด้วย CSS แต่จำเป็นต้องมีใน DOM เพื่อไม่ให้ app.js บั๊ก) -->
+            <!-- ส่วนควบคุมระบบ -->
             <div class="header-controls">
+                <!-- ส่วนจัดการหลายตารางเรียน (ปรับใช้ SVG แทนอิโมจิ) -->
                 <div class="schedule-management">
                     <label for="schedule-select" class="schedule-label">📁 แฟ้มตารางเรียน:</label>
                     <select id="schedule-select" class="schedule-select"
                         title="เลือกตารางเรียนที่ต้องการเปิดดู"></select>
 
                     <button id="btn-create-schedule" class="btn btn-secondary btn-sm" title="สร้างตารางเรียนใหม่">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                        </svg>
                         สร้างตาราง
                     </button>
                     <button id="btn-rename-schedule" class="btn btn-secondary btn-sm" title="เปลี่ยนชื่อตารางเรียนนี้">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
                         เปลี่ยนชื่อ
                     </button>
                     <button id="btn-delete-schedule" class="btn btn-secondary btn-sm-danger" title="ลบตารางเรียนนี้">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                        </svg>
                         ลบตาราง
                     </button>
                 </div>
 
                 <div class="view-toggles">
                     <button id="toggle-weekly" class="btn-toggle active" onclick="switchView('weekly')">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M19 4H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" />
+                        </svg>
                         ตารางเรียนรายสัปดาห์
                     </button>
                     <button id="toggle-today" class="btn-toggle" onclick="switchView('today')">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                        </svg>
                         ตารางสรุปรายวัน
                     </button>
                 </div>
 
                 <button id="btn-open-customizer" class="btn btn-secondary" title="ตกแต่งตารางเรียน ปรับธีม และฟอนต์">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path
+                            d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.75-.39-1.04-.23-.29-.38-.67-.38-1.09 0-.83.67-1.5 1.5-1.5H16.2c2.28 0 4.12-1.84 4.12-4.12 0-4.97-4.03-9-9-9zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5S18.33 12 17.5 12z" />
+                    </svg>
                     ตกแต่งตาราง
                 </button>
 
                 <button id="btn-toggle-orientation" class="btn btn-secondary" title="สลับเลย์เอาต์แนวตั้ง / แนวนอน">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
+                    </svg>
                     สลับแนวตั้ง/แนวนอน
                 </button>
 
+
                 <div class="backup-controls">
-                    <button id="btn-save-image" class="btn btn-primary">บันทึกตารางเป็นรูปภาพ</button>
-                    <button id="btn-load-template" class="btn btn-secondary">โหลดเทมเพลตตัวอย่าง</button>
-                    <button id="btn-export" class="btn btn-secondary">ส่งออกข้อมูล</button>
-                    <button id="btn-import-trigger" class="btn btn-secondary">นำเข้าข้อมูล</button>
+                    <!-- ปุ่มบันทึกเป็นรูปภาพพรีเมียม -->
+                    <button id="btn-save-image" class="btn btn-primary" title="เซฟตารางเรียนทั้งหมดเป็นรูปภาพ PNG">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v12h14V6H5zm4.5 9L12 11.5l2.5 3.5h-5z" />
+                        </svg>
+                        บันทึกตารางเป็นรูปภาพ
+                    </button>
+                    <!-- ปุ่มโหลดตัวอย่างตารางเรียน -->
+                    <button id="btn-load-template" class="btn btn-secondary"
+                        title="โหลดตัวอย่างวิชาเรียนเพื่อเริ่มเขียนตาราง">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-6h2v6zm0-8h-2V8h2v2z" />
+                        </svg>
+                        โหลดเทมเพลตตัวอย่าง
+                    </button>
+                    <button id="btn-export" class="btn btn-secondary" title="สำรองข้อมูลตารางเรียน">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                        </svg>
+                        ส่งออกข้อมูล
+                    </button>
+                    <button id="btn-import-trigger" class="btn btn-secondary" title="นำเข้าข้อมูลตารางเรียน">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z" />
+                        </svg>
+                        นำเข้าข้อมูล
+                    </button>
                     <input type="file" id="file-import" accept=".json" style="display: none;">
                 </div>
             </div>
         </header>
 
-        <!-- แถบปุ่มเลือกวันสำหรับหน้าจอมือถือ (ซ่อนไว้) -->
+        <!-- แถบปุ่มเลือกวันสำหรับหน้าจอมือถือ -->
         <nav class="mobile-day-selector" id="mobile-day-tabs">
             <button class="day-tab active" data-day="Monday">จ.</button>
             <button class="day-tab" data-day="Tuesday">อ.</button>
@@ -169,7 +229,7 @@
             <!-- 1. ตารางเรียนรายสัปดาห์ -->
             <div id="view-weekly-container" class="view-content active">
                 <div id="timetable-capture-area" class="timetable-capture-area">
-                    <!-- ส่วนหัวการ์ดส่งออก -->
+                    <!-- ส่วนหัวการ์ดส่งออก (แสดงเฉพาะในรูปภาพส่งออก หรือตกแต่งด้านบน) -->
                     <div class="capture-header">
                         <div class="capture-logo-section">
                             <div class="capture-logo-icon">🕒</div>
@@ -218,20 +278,155 @@
             </div>
         </main>
 
-        <!-- Floating Add Button (ซ่อนไว้) -->
-        <button id="btn-add-subject" class="btn-floating" style="display: none !important;">
+        <!-- Floating Add Button -->
+        <button id="btn-add-subject" class="btn-floating" title="เพิ่มวิชาเรียนใหม่">
             <span>+</span>
         </button>
 
-        <!-- Modal (ซ่อนไว้) -->
-        <div id="subject-modal" class="modal"></div>
+        <!-- Modal จัดการวิชาเรียน -->
+        <div id="subject-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">จัดการข้อมูลวิชาเรียน</h2>
+                    <button class="close-modal" id="btn-close-modal" aria-label="ปิดกล่อง">&times;</button>
+                </div>
+                <form id="subject-form" class="modal-form">
+                    <input type="hidden" id="subject-id">
 
-        <!-- Drawer (ซ่อนไว้) -->
-        <div id="customizer-drawer" class="customizer-drawer"></div>
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="subject-code">รหัสวิชา</label>
+                            <input type="text" id="subject-code" placeholder="เช่น CS-211" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject-name">ชื่อวิชา</label>
+                            <input type="text" id="subject-name" placeholder="เช่น Data Structures" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject-teacher">อาจารย์ผู้สอน</label>
+                        <input type="text" id="subject-teacher" placeholder="เช่น รศ.ดร. สมชาย">
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="subject-day">วันเรียน</label>
+                            <select id="subject-day" required>
+                                <option value="Monday">วันจันทร์</option>
+                                <option value="Tuesday">วันอังคาร</option>
+                                <option value="Wednesday">วันพุธ</option>
+                                <option value="Thursday">วันพฤหัสบดี</option>
+                                <option value="Friday">วันศุกร์</option>
+                                <option value="Saturday">วันเสาร์</option>
+                                <option value="Sunday">วันอาทิตย์</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="subject-start">เวลาเริ่มต้น</label>
+                            <input type="time" id="subject-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject-end">เวลาสิ้นสุด</label>
+                            <input type="time" id="subject-end" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject-room">สถานที่เรียน / ลิงก์ห้องเรียน</label>
+                        <input type="text" id="subject-room" placeholder="เช่น ห้อง 405 หรือ ลิงก์ MS Teams">
+                    </div>
+
+                    <!-- ส่วนเลือกแถบสี -->
+                    <div class="form-group">
+                        <label>แถบสีระบุรายวิชา (Color Tag)</label>
+                        <div class="color-picker-wrapper">
+                            <label class="color-option color-indigo" title="Indigo (สีน้ำเงินคราม)">
+                                <input type="radio" name="subject-color" value="indigo" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-emerald" title="Emerald (สีเขียวมรกต)">
+                                <input type="radio" name="subject-color" value="emerald">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-coral" title="Coral (สีส้มปะการัง)">
+                                <input type="radio" name="subject-color" value="coral">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-amethyst" title="Amethyst (สีม่วงอเมทิสต์)">
+                                <input type="radio" name="subject-color" value="amethyst">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-amber" title="Amber (สีทองอำพัน)">
+                                <input type="radio" name="subject-color" value="amber">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="btn-cancel" class="btn btn-secondary">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึกข้อมูลรายวิชา</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Drawer แผงปรับแต่งสไตล์ (Premium Visual Customizer) -->
+        <div id="customizer-drawer" class="customizer-drawer">
+            <div class="drawer-header">
+                <h2>🎨 ปรับแต่งตารางเรียน</h2>
+                <button id="btn-close-customizer" class="close-drawer" aria-label="ปิดกล่อง">&times;</button>
+            </div>
+            <div class="drawer-body">
+
+                <!-- 2. เลือกแบบอักษร -->
+                <div class="customize-section">
+                    <h3>แบบอักษรไทย (Thai Font)</h3>
+                    <select id="font-select" class="customizer-select">
+                        <option value="font-kanit">Kanit (โมเดิร์น มีหัวมน)</option>
+                        <option value="font-sarabun">Sarabun (ทางการ อ่านง่าย)</option>
+                        <option value="font-chonburi">Chonburi (เก๋ไก๋ ย้อนยุค)</option>
+                        <option value="font-mitr">Mitr (ร่วมสมัย ไม่มีหัว)</option>
+                    </select>
+                </div>
+
+                <!-- 3. ความเร็วพื้นหลัง Aurora -->
+                <div class="customize-section" id="aurora-speed-control">
+                    <h3>ความเร็วเคลื่อนไหว Aurora (วินาที)</h3>
+                    <div class="slider-wrapper">
+                        <input type="range" id="aurora-speed-slider" min="0" max="60" value="30" step="5">
+                        <span id="aurora-speed-val">30s</span>
+                    </div>
+                    <p class="section-desc">ปรับเป็น 0 เพื่อให้พื้นหลังออโรร่าหยุดนิ่ง ช่วยประหยัดแบตเตอรี่</p>
+                </div>
+
+                <!-- 4. พื้นหลังรูปภาพส่วนตัว -->
+                <div class="customize-section">
+                    <h3>อัปโหลดภาพพื้นหลังส่วนตัว</h3>
+                    <div class="bg-upload-wrapper">
+                        <button type="button" id="btn-upload-bg-trigger" class="btn btn-secondary btn-sm"
+                            style="width: 100%; margin-bottom: 8px;">
+                            📁 เลือกรูปภาพจากเครื่อง
+                        </button>
+                        <input type="file" id="bg-image-upload" accept="image/*" style="display: none;">
+                        <button type="button" id="btn-reset-bg" class="btn-sm-danger"
+                            style="width: 100%; border-radius: 6px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: none;">
+                            🗑️ ลบพื้นหลังส่วนตัว
+                        </button>
+                    </div>
+                    <p class="section-desc">รูปภาพจะถูกนำไปเบลอเป็นฉากหลังกระจกฝ้าอย่างหรูหรา</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Toast แจ้งเตือนข้อความ -->
         <div id="toast" class="toast"></div>
     </div>
+
 
     <script src="app.js?v=1.5"></script>
     <script>
