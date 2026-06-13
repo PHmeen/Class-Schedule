@@ -1028,6 +1028,15 @@ function exportToICS() {
         const endDateTime = formatICSDate(startDayDate, sub.endTime);
         const icsDay = icsDays[sub.day] || 'MO';
 
+        const dayNameTh = dayNamesTh[sub.day] || sub.day;
+        const descriptionText = [
+            `รหัสวิชา: ${sub.subjectCode}`,
+            `ชื่อวิชา: ${sub.subjectName}`,
+            `อาจารย์ผู้สอน: ${sub.teacher || 'ไม่ระบุ'}`,
+            `ห้องเรียน/สถานที่: ${sub.room || 'ไม่ระบุ'}`,
+            `เวลาเรียน: เรียนทุกวัน${dayNameTh} เวลา ${sub.startTime} - ${sub.endTime} น.`
+        ].join('\\n');
+
         icsContent += [
             'BEGIN:VEVENT',
             `UID:${sub.id}-${Date.now()}@timetable`,
@@ -1037,7 +1046,7 @@ function exportToICS() {
             `DTEND;TZID=Asia/Bangkok:${endDateTime}`,
             `RRULE:FREQ=WEEKLY;UNTIL=${untilStr};BYDAY=${icsDay}`,
             `LOCATION:${sub.room || 'ไม่ระบุห้องเรียน'}`,
-            `DESCRIPTION:อาจารย์ผู้สอน: ${sub.teacher || 'ไม่ระบุอาจารย์'}`,
+            `DESCRIPTION:${descriptionText}`,
             'END:VEVENT'
         ].join('\r\n') + '\r\n';
     });
