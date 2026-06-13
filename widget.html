@@ -1,163 +1,86 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academic Timetable - Widget</title>
-    <!-- Google Fonts: Outfit, Kanit, Sarabun, Chonburi, Mitr -->
+    <!-- Google Fonts: Outfit และ Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Chonburi&family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Chonburi&family=Mitr:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=1.5">
     <style>
-        body {
-            padding: 4px !important;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden !important;
-            background: transparent !important;
-        }
-        
-        .app-container {
-            width: 100%;
-            height: calc(100vh - 8px);
-            min-height: calc(100vh - 8px);
-            padding: 10px !important;
-            margin: 0 !important;
-            display: flex;
-            flex-direction: column;
-            border-radius: var(--border-radius-lg);
-            background: rgba(255, 255, 255, 0.82) !important;
-            backdrop-filter: blur(25px) !important;
-            -webkit-backdrop-filter: blur(25px) !important;
-            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04) !important;
-            border: 1px solid rgba(255, 255, 255, 0.7) !important;
-            gap: 6px;
-        }
-
-        .widget-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            padding-bottom: 6px;
-            flex-shrink: 0;
-            width: 100%;
-        }
-
-        .widget-title {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .schedule-name {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2px 8px;
-            border-radius: 20px;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-
-        /* Hide actions inside subject cards for widgets */
-        .card-actions {
+        /* Hide all editing/control elements for the widget mode */
+        .header-controls,
+        .btn-floating,
+        .card-actions,
+        .customizer-drawer,
+        .modal,
+        .mobile-day-selector,
+        #toast {
             display: none !important;
         }
 
-        .timetable-wrapper {
-            border-radius: var(--border-radius-md);
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            scrollbar-width: thin;
+        /* Prevent scrolling on the widget body and let container fit the widget window */
+        body {
+            padding: 8px !important;
+            margin: 0 !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+        }
+
+        .app-container {
+            min-height: calc(100vh - 16px) !important;
+            height: calc(100vh - 16px) !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-main {
             flex-grow: 1;
-            overflow: auto;
-            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .timetable-grid.horizontal {
-            grid-template-columns: 80px repeat(24, minmax(65px, 1fr));
-            grid-template-rows: 38px repeat(7, minmax(80px, auto));
-            min-width: 1640px; 
+        .view-content.active {
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
-        .timetable-grid.horizontal .grid-header-cell {
-            padding-left: 10px;
-            font-size: 0.9rem;
-            border-right: 1.5px solid #cbd5e1;
+        .timetable-capture-area {
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
 
-        .timetable-grid.horizontal .time-axis-cell {
-            font-size: 0.8rem;
-            border-right: 1px dashed #e2e8f0;
+        .timetable-wrapper {
+            flex-grow: 1;
+            overflow: auto !important;
         }
 
-        .timetable-grid.horizontal .time-label-header {
-            font-size: 0.75rem;
-            border-right: 1.5px solid #cbd5e1;
-        }
-
-        .timetable-grid.horizontal .grid-cell {
-            border-right: 1px dashed #f1f5f9;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .timetable-grid.horizontal .grid-cell.hour-line {
-            border-right: 1px solid #cbd5e1;
-        }
-
-        /* Subject card typography scaled down slightly for widget */
-        .subject-card {
-            padding: 6px 8px;
-            gap: 3px;
-        }
-
-        .card-time {
-            font-size: 0.72rem;
-            padding: 1px 4px;
-        }
-
-        .card-code-badge {
-            font-size: 0.72rem;
-            padding: 1px 4px;
-        }
-
-        .card-name {
-            font-size: 0.8rem;
-            line-height: 1.3;
-        }
-
-        .card-details {
-            font-size: 0.68rem;
-            padding-top: 3px;
-        }
-
-        /* Empty State */
-        .grid-empty-state {
-            font-size: 0.85rem !important;
-            padding: 20px !important;
-        }
-
-        /* Force weekly grid layout on all screen sizes in the widget */
+        /* ==========================================================================
+           WIDGET GRID FORCE (OVERRIDE COLLAPSE ON SMALL SCREEN WIDTHS)
+           ========================================================================== */
+        /* Horizontal Grid Override */
         body:not(.is-capturing) .timetable-grid.horizontal {
-            grid-template-columns: 80px repeat(24, minmax(65px, 1fr)) !important;
-            grid-template-rows: 38px repeat(7, minmax(80px, auto)) !important;
-            min-width: 1640px !important;
+            grid-template-columns: 100px repeat(24, minmax(65px, 1fr)) !important;
+            grid-template-rows: 50px repeat(7, minmax(85px, auto)) !important;
+            min-width: 1660px !important;
         }
 
         body:not(.is-capturing) .timetable-grid.horizontal [data-day] {
             display: flex !important;
         }
 
-        /* Restore correct grid rows for headers and cards */
         body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Monday"] { grid-row: 2 !important; }
         body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Tuesday"] { grid-row: 3 !important; }
         body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Wednesday"] { grid-row: 4 !important; }
@@ -174,6 +97,33 @@
         body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Saturday"] { grid-row: 7 !important; }
         body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Sunday"] { grid-row: 8 !important; }
 
+        /* Vertical Grid Override */
+        body:not(.is-capturing) .timetable-grid.vertical {
+            grid-template-columns: 85px repeat(7, minmax(170px, 1fr)) !important;
+            grid-template-rows: 54px repeat(24, 42px) !important;
+            min-width: 1275px !important;
+        }
+
+        body:not(.is-capturing) .timetable-grid.vertical [data-day] {
+            display: flex !important;
+        }
+
+        body:not(.is-capturing) .timetable-grid.vertical .grid-header-cell[data-day="Monday"] { grid-column: 2 !important; grid-row: 1 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .grid-header-cell[data-day="Tuesday"] { grid-column: 3 !important; grid-row: 1 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .grid-header-cell[data-day="Wednesday"] { grid-column: 4 !important; grid-row: 1 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .grid-header-cell[data-day="Thursday"] { grid-column: 5 !important; grid-row: 1 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .grid-header-cell[data-day="Friday"] { grid-column: 6 !important; grid-row: 1 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .grid-header-cell[data-day="Saturday"] { grid-column: 7 !important; grid-row: 1 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .grid-header-cell[data-day="Sunday"] { grid-column: 8 !important; grid-row: 1 !important; }
+
+        body:not(.is-capturing) .timetable-grid.vertical .subject-card[data-day="Monday"] { grid-column: 2 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .subject-card[data-day="Tuesday"] { grid-column: 3 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .subject-card[data-day="Wednesday"] { grid-column: 4 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .subject-card[data-day="Thursday"] { grid-column: 5 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .subject-card[data-day="Friday"] { grid-column: 6 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .subject-card[data-day="Saturday"] { grid-column: 7 !important; }
+        body:not(.is-capturing) .timetable-grid.vertical .subject-card[data-day="Sunday"] { grid-column: 8 !important; }
+
         body:not(.is-capturing) .timetable-grid[data-active-day="Monday"] [data-day]:not([data-day="Monday"]),
         body:not(.is-capturing) .timetable-grid[data-active-day="Tuesday"] [data-day]:not([data-day="Tuesday"]),
         body:not(.is-capturing) .timetable-grid[data-active-day="Wednesday"] [data-day]:not([data-day="Wednesday"]),
@@ -183,15 +133,11 @@
         body:not(.is-capturing) .timetable-grid[data-active-day="Sunday"] [data-day]:not([data-day="Sunday"]) {
             display: flex !important;
         }
-
-        /* Hide mobile day selector tabs in widget */
-        .mobile-day-selector, #mobile-day-tabs {
-            display: none !important;
-        }
     </style>
 </head>
+
 <body>
-    <!-- พื้นหลังออโรร่าพริ้วไหว -->
+    <!-- พื้นหลังออโรร่าพริ้วไหว (Dynamic Aurora Background Effect) -->
     <div class="aurora-bg">
         <div class="aurora-blob aurora-blob-1"></div>
         <div class="aurora-blob aurora-blob-2"></div>
@@ -199,199 +145,169 @@
     </div>
 
     <div class="app-container">
-        <div class="widget-header">
-            <div class="widget-title">📅 ตารางเรียนรายสัปดาห์ (Widget)</div>
-            <div class="schedule-name" id="schedule-name">ตารางเรียน</div>
-        </div>
+        <!-- Header ส่วนหัวของเว็บ -->
+        <header class="app-header">
+            <div class="header-main">
+                <div class="logo-area">
+                    <div class="logo-icon-wrapper">
+                        <svg class="logo-svg" viewBox="0 0 24 24">
+                            <path
+                                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 6c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm6 12H6v-1.5c0-1.99 4-3 6-3s6 1.01 6 3V21z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="app-title">Academic Timetable</h1>
+                        <p class="app-subtitle">ระบบตารางเรียนประสิทธิภาพสูง แสดงตารางตามช่วงเวลาจริง ✨</p>
+                    </div>
+                </div>
+                <!-- วันและเวลานาฬิกาเรียบหรู -->
+                <div class="datetime-wrapper" style="display: flex; gap: 8px; align-items: center;">
+                    <span id="offline-badge" class="offline-badge" style="display: none;" title="คุณกำลังใช้งานแบบออฟไลน์">📡 ออฟไลน์</span>
+                    <div class="datetime-display" id="current-datetime">
+                        กำลังดึงข้อมูลเวลา...
+                    </div>
+                </div>
 
-        <div class="timetable-capture-area" style="padding: 0; background: transparent; border: none; box-shadow: none; height: 100%; display: flex; flex-direction: column;">
-            <div class="timetable-wrapper">
-                <div class="timetable-grid horizontal" id="timetable-weekly-grid">
-                    <div class="grid-header-cell time-label-header">เวลา / วัน</div>
-                    <div class="grid-header-cell day-header-mon" data-day="Monday">จันทร์</div>
-                    <div class="grid-header-cell day-header-tue" data-day="Tuesday">อังคาร</div>
-                    <div class="grid-header-cell day-header-wed" data-day="Wednesday">พุธ</div>
-                    <div class="grid-header-cell day-header-thu" data-day="Thursday">พฤหัสบดี</div>
-                    <div class="grid-header-cell day-header-fri" data-day="Friday">ศุกร์</div>
-                    <div class="grid-header-cell day-header-sat" data-day="Saturday">เสาร์</div>
-                    <div class="grid-header-cell day-header-sun" data-day="Sunday">อาทิตย์</div>
+            </div>
+
+            <!-- ส่วนควบคุมระบบ (จะถูกซ่อนไว้ด้วย CSS แต่จำเป็นต้องมีใน DOM เพื่อไม่ให้ app.js บั๊ก) -->
+            <div class="header-controls">
+                <div class="schedule-management">
+                    <label for="schedule-select" class="schedule-label">📁 แฟ้มตารางเรียน:</label>
+                    <select id="schedule-select" class="schedule-select"
+                        title="เลือกตารางเรียนที่ต้องการเปิดดู"></select>
+
+                    <button id="btn-create-schedule" class="btn btn-secondary btn-sm" title="สร้างตารางเรียนใหม่">
+                        สร้างตาราง
+                    </button>
+                    <button id="btn-rename-schedule" class="btn btn-secondary btn-sm" title="เปลี่ยนชื่อตารางเรียนนี้">
+                        เปลี่ยนชื่อ
+                    </button>
+                    <button id="btn-delete-schedule" class="btn btn-secondary btn-sm-danger" title="ลบตารางเรียนนี้">
+                        ลบตาราง
+                    </button>
+                </div>
+
+                <div class="view-toggles">
+                    <button id="toggle-weekly" class="btn-toggle active" onclick="switchView('weekly')">
+                        ตารางเรียนรายสัปดาห์
+                    </button>
+                    <button id="toggle-today" class="btn-toggle" onclick="switchView('today')">
+                        ตารางสรุปรายวัน
+                    </button>
+                </div>
+
+                <button id="btn-open-customizer" class="btn btn-secondary" title="ตกแต่งตารางเรียน ปรับธีม และฟอนต์">
+                    ตกแต่งตาราง
+                </button>
+
+                <button id="btn-toggle-orientation" class="btn btn-secondary" title="สลับเลย์เอาต์แนวตั้ง / แนวนอน">
+                    สลับแนวตั้ง/แนวนอน
+                </button>
+
+                <div class="backup-controls">
+                    <button id="btn-save-image" class="btn btn-primary">บันทึกตารางเป็นรูปภาพ</button>
+                    <button id="btn-load-template" class="btn btn-secondary">โหลดเทมเพลตตัวอย่าง</button>
+                    <button id="btn-export" class="btn btn-secondary">ส่งออกข้อมูล</button>
+                    <button id="btn-import-trigger" class="btn btn-secondary">นำเข้าข้อมูล</button>
+                    <input type="file" id="file-import" accept=".json" style="display: none;">
                 </div>
             </div>
-        </div>
+        </header>
+
+        <!-- แถบปุ่มเลือกวันสำหรับหน้าจอมือถือ (ซ่อนไว้) -->
+        <nav class="mobile-day-selector" id="mobile-day-tabs">
+            <button class="day-tab active" data-day="Monday">จ.</button>
+            <button class="day-tab" data-day="Tuesday">อ.</button>
+            <button class="day-tab" data-day="Wednesday">พ.</button>
+            <button class="day-tab" data-day="Thursday">พฤ.</button>
+            <button class="day-tab" data-day="Friday">ศ.</button>
+            <button class="day-tab" data-day="Saturday">ส.</button>
+            <button class="day-tab" data-day="Sunday">อา.</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- 1. ตารางเรียนรายสัปดาห์ -->
+            <div id="view-weekly-container" class="view-content active">
+                <div id="timetable-capture-area" class="timetable-capture-area">
+                    <!-- ส่วนหัวการ์ดส่งออก -->
+                    <div class="capture-header">
+                        <div class="capture-logo-section">
+                            <div class="capture-logo-icon">🕒</div>
+                            <div>
+                                <h3 class="capture-app-title">Academic Timetable</h3>
+                                <p class="capture-app-subtitle">ตารางเรียนและเวลากิจกรรมประสิทธิภาพสูง ✨</p>
+                            </div>
+                        </div>
+                        <div class="capture-info-section">
+                            <h2 class="capture-schedule-title" id="export-schedule-name">ตารางหลักของฉัน</h2>
+                            <p class="capture-timestamp-subtitle" id="export-schedule-timestamp">
+                                ข้อมูลตารางเรียนปัจจุบัน</p>
+                        </div>
+                    </div>
+
+                    <div class="timetable-wrapper">
+                        <div class="timetable-grid" id="timetable-weekly-grid">
+                            <!-- แถวบนสุด: วันจันทร์ - อาทิตย์ -->
+                            <div class="grid-header-cell time-label-header">เวลา / วัน</div>
+                            <div class="grid-header-cell day-header-mon" data-day="Monday">จันทร์</div>
+                            <div class="grid-header-cell day-header-tue" data-day="Tuesday">อังคาร</div>
+                            <div class="grid-header-cell day-header-wed" data-day="Wednesday">พุธ</div>
+                            <div class="grid-header-cell day-header-thu" data-day="Thursday">พฤหัสบดี</div>
+                            <div class="grid-header-cell day-header-fri" data-day="Friday">ศุกร์</div>
+                            <div class="grid-header-cell day-header-sat" data-day="Saturday">เสาร์</div>
+                            <div class="grid-header-cell day-header-sun" data-day="Sunday">อาทิตย์</div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนท้ายการ์ดส่งออก (ลายน้ำ) -->
+                    <div class="capture-footer">
+                        <span>✨ ตารางเรียนระดับพรีเมียม จัดทำและบันทึกโดย PHATHIT MEEN</span>
+                        <span>https://timetable.psu.th</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ตารางสรุปรายวัน -->
+            <div id="view-today-container" class="view-content">
+                <div class="today-planner">
+                    <h2 class="today-title" id="today-view-title">รายการวิชาเรียนวันนี้</h2>
+                    <div class="today-list" id="today-subjects-list">
+                        <!-- วิชาเรียนของวันนี้ -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Add Button (ซ่อนไว้) -->
+        <button id="btn-add-subject" class="btn-floating" style="display: none !important;">
+            <span>+</span>
+        </button>
+
+        <!-- Modal (ซ่อนไว้) -->
+        <div id="subject-modal" class="modal"></div>
+
+        <!-- Drawer (ซ่อนไว้) -->
+        <div id="customizer-drawer" class="customizer-drawer"></div>
+
+        <!-- Toast แจ้งเตือนข้อความ -->
+        <div id="toast" class="toast"></div>
     </div>
 
+    <script src="app.js?v=1.5"></script>
     <script>
-        const START_HOUR = 8; 
-        const END_HOUR = 20;  
-        const TOTAL_ROWS = (END_HOUR - START_HOUR) * 2; 
-
-        const dayColumnIndices = {
-            'Monday': 2, 'Tuesday': 3, 'Wednesday': 4, 'Thursday': 5, 'Friday': 6, 'Saturday': 7, 'Sunday': 8
-        };
-        const columnIndexToDay = {
-            2: 'Monday', 3: 'Tuesday', 4: 'Wednesday', 5: 'Thursday', 6: 'Friday', 7: 'Saturday', 8: 'Sunday'
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initWidget();
-            
-            // Sync when data updates in other tabs
-            window.addEventListener('storage', (e) => {
-                if (e.key === 'my_schedules_list' || e.key === 'my_active_schedule_id' || e.key === 'my_custom_font' || e.key === 'my_custom_bg_base64') {
-                    initWidget();
-                }
-            });
+        // รีโหลด Widget อัตโนมัติทันทีที่ตรวจพบการเปลี่ยนแปลงข้อมูลจากหน้าหลัก
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'my_schedules_list' || 
+                e.key === 'my_active_schedule_id' || 
+                e.key === 'my_custom_font' || 
+                e.key === 'my_custom_bg_base64' || 
+                e.key === 'my_grid_orientation') {
+                window.location.reload();
+            }
         });
-
-        function initWidget() {
-            // Apply customized font and background
-            const fontClass = localStorage.getItem('my_custom_font') || 'font-kanit';
-            document.body.className = '';
-            document.body.classList.add(fontClass);
-
-            const savedBg = localStorage.getItem('my_custom_bg_base64');
-            if (savedBg) {
-                document.body.style.setProperty('--custom-bg-url', `url(${savedBg})`);
-                document.body.classList.add('has-custom-bg');
-            } else {
-                document.body.style.removeProperty('--custom-bg-url');
-                document.body.classList.remove('has-custom-bg');
-            }
-
-            renderWeeklyGrid();
-        }
-
-        function getActiveSchedule() {
-            const listData = localStorage.getItem('my_schedules_list');
-            const activeId = localStorage.getItem('my_active_schedule_id');
-            if (listData) {
-                try {
-                    const schedules = JSON.parse(listData);
-                    return schedules.find(s => s.id === activeId) || schedules[0];
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-            return null;
-        }
-
-        function timeToGridCol(timeStr) {
-            const [h, m] = timeStr.split(':').map(Number);
-            const clampedH = Math.max(START_HOUR, Math.min(END_HOUR, h));
-            const minutesSinceStart = (clampedH - START_HOUR) * 60 + m;
-            return Math.round(minutesSinceStart / 30) + 2;
-        }
-
-        function renderWeeklyGrid() {
-            const grid = document.getElementById('timetable-weekly-grid');
-            if (!grid) return;
-
-            // Clear old cells
-            const elementsToRemove = grid.querySelectorAll('.time-axis-cell, .grid-cell, .subject-card, .grid-empty-state');
-            elementsToRemove.forEach(el => el.remove());
-
-            // 1. Time axis headers
-            for (let hour = START_HOUR; hour < END_HOUR; hour++) {
-                const timeCell = document.createElement('div');
-                timeCell.className = 'time-axis-cell';
-                const startCol = (hour - START_HOUR) * 2 + 2;
-                timeCell.style.gridColumn = `${startCol} / ${startCol + 2}`;
-                timeCell.style.gridRow = '1';
-                timeCell.innerText = `${String(hour).padStart(2, '0')}:00`;
-                grid.appendChild(timeCell);
-            }
-
-            // 2. Background cells
-            for (let dayRow = 2; dayRow <= 8; dayRow++) {
-                const dayName = columnIndexToDay[dayRow];
-                for (let slot = 0; slot < TOTAL_ROWS; slot++) {
-                    const colNum = slot + 2;
-                    const isHourEnd = (slot % 2 === 1); 
-                    
-                    const cell = document.createElement('div');
-                    cell.className = `grid-cell ${isHourEnd ? 'hour-line' : ''}`;
-                    cell.style.gridRow = `${dayRow}`;
-                    cell.style.gridColumn = `${colNum}`;
-                    grid.appendChild(cell);
-                }
-            }
-
-            const activeSch = getActiveSchedule();
-            const label = document.getElementById('schedule-name');
-            if (activeSch) {
-                label.innerText = activeSch.name;
-            } else {
-                label.innerText = 'ตารางเรียน';
-            }
-
-            const subjects = activeSch ? activeSch.subjects : [];
-
-            if (subjects.length === 0) {
-                const emptyState = document.createElement('div');
-                emptyState.className = 'grid-empty-state';
-                emptyState.style.gridColumn = '2 / 26';
-                emptyState.style.gridRow = '2 / 9';
-                emptyState.style.display = 'flex';
-                emptyState.style.flexDirection = 'column';
-                emptyState.style.justifyContent = 'center';
-                emptyState.style.alignItems = 'center';
-                emptyState.style.color = 'var(--text-muted)';
-                emptyState.innerHTML = `
-                    <div style="font-size: 1.8rem; margin-bottom: 8px;">📅</div>
-                    <div style="font-weight: 500;">ตารางเรียนว่างเปล่า</div>
-                `;
-                grid.appendChild(emptyState);
-                return;
-            }
-
-            const now = new Date();
-            const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const currentDayNameEn = englishDays[now.getDay()];
-            const currentH = now.getHours();
-            const currentM = now.getMinutes();
-            const currentTimeStr = `${String(currentH).padStart(2, '0')}:${String(currentM).padStart(2, '0')}`;
-
-            // 3. Render subjects with same structure as main website
-            subjects.forEach((sub, index) => {
-                const cardIndex = dayColumnIndices[sub.day];
-                if (!cardIndex) return;
-
-                const startVal = timeToGridCol(sub.startTime);
-                let endVal = timeToGridCol(sub.endTime);
-                if (endVal <= startVal) endVal = startVal + 1;
-
-                const card = document.createElement('div');
-                card.className = `subject-card card-${sub.color}`;
-                card.style.setProperty('--delay', index || 0);
-                card.style.gridRow = `${cardIndex}`;
-                card.style.gridColumn = `${startVal} / ${endVal}`;
-                
-                card.setAttribute('data-id', sub.id);
-                card.setAttribute('data-day', sub.day);
-
-                const isActiveClass = (sub.day === currentDayNameEn && 
-                                       currentTimeStr >= sub.startTime && 
-                                       currentTimeStr <= sub.endTime);
-
-                if (isActiveClass) {
-                    card.classList.add('active-now-card');
-                }
-
-                card.innerHTML = `
-                    <div class="card-header-row">
-                        <span class="card-time">${sub.startTime} - ${sub.endTime}</span>
-                        ${isActiveClass ? `<span class="active-pulse-badge" title="คาบเรียนที่กำลังดำเนินอยู่ขณะนี้"><span class="active-pulse-dot"></span>เรียนอยู่</span>` : ''}
-                        <span class="card-code-badge">${sub.subjectCode}</span>
-                    </div>
-                    <div class="card-name" title="${sub.subjectName}">${sub.subjectName}</div>
-                    <div class="card-details">
-                        ${sub.teacher ? `<span class="card-teacher" title="อาจารย์: ${sub.teacher}">👩‍🏫 ${sub.teacher}</span>` : ''}
-                        <span class="card-room" title="สถานที่: ${sub.room || 'ไม่ระบุห้องเรียน'}">📍 ${sub.room ? sub.room : 'ไม่ระบุห้องเรียน'}</span>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
     </script>
 </body>
+
 </html>
