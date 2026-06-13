@@ -1039,7 +1039,7 @@ function exportToICS() {
 
         icsContent += [
             'BEGIN:VEVENT',
-            `UID:${sub.id}-${Date.now()}@timetable`,
+            `UID:${sub.id}@timetable`,
             `DTSTAMP:${nowStr}`,
             `SUMMARY:${sub.subjectCode} ${sub.subjectName}`,
             `DTSTART;TZID=Asia/Bangkok:${startDateTime}`,
@@ -1064,10 +1064,81 @@ function exportToICS() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast('📅 ส่งออกไฟล์ปฏิทิน (.ics) สำเร็จแล้ว! ดับเบิลคลิกไฟล์เพื่อบันทึกเข้าปฏิทิน');
+        showToast('📅 ส่งออกไฟล์ปฏิทิน (.ics) สำเร็จแล้ว!');
+        
+        // แนะนำการนำเข้าสู่ Google Calendar และวิธีการจัดการบน iPad
+        setTimeout(() => {
+            alert('💡 ข้อแนะนำสำคัญสำหรับ iPad/iPhone และ Google Calendar:\n\n' +
+                  '1. ตอนกดเปิดไฟล์ปฏิทิน ให้เลือก "สร้างปฏิทินใหม่" (เช่น ตั้งชื่อว่า "ตารางเรียน")\n' +
+                  '2. หากต้องการลบตารางเรียนนี้ออกทั้งหมดในอนาคต คุณสามารถสั่ง "ลบปฏิทิน" นั้นทิ้งได้ทันทีในคลิกเดียว (วิชาทั้งหมดจะหายไปพร้อมกัน ไม่ต้องไล่ลบทีละอันครับ)');
+            
+            if (confirm('สำหรับผู้ใช้ Google Calendar: คุณต้องการเปิดหน้าเว็บ Google Calendar เพื่อนำเข้าไฟล์ (.ics) เลยหรือไม่?')) {
+                window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+            }
+        }, 800);
     } catch (e) {
         console.error(e);
         showToast('⚠️ ส่งออกปฏิทินล้มเหลว');
+    }
+}
+
+// ลบรายวิชาเรียนออกจาก Apple Calendar / Google Calendar ผ่านไฟล์ .ics
+function cancelToICS() {
+    const activeSch = getActiveSchedule();
+    if (!activeSch || activeSch.subjects.length === 0) {
+        showToast('⚠️ ไม่มีข้อมูลวิชาเรียนที่จะลบ');
+        return;
+    }
+
+    if (!confirm('คุณต้องการโหลดไฟล์สำหรับลบวิชาเรียนทั้งหมดนี้ออกจากปฏิทินใช่หรือไม่? (เมื่อดาวน์โหลดแล้วให้เปิดไฟล์เพื่อยืนยันลบในปฏิทินเครื่อง)')) {
+        return;
+    }
+
+    const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+    let icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//PHATHIT MEEN//Academic Timetable//TH',
+        'CALSCALE:GREGORIAN',
+        'METHOD:CANCEL'
+    ].join('\r\n') + '\r\n';
+
+    activeSch.subjects.forEach(sub => {
+        icsContent += [
+            'BEGIN:VEVENT',
+            `UID:${sub.id}@timetable`,
+            `DTSTAMP:${nowStr}`,
+            `SUMMARY:${sub.subjectCode} ${sub.subjectName}`,
+            `STATUS:CANCELLED`,
+            'END:VEVENT'
+        ].join('\r\n') + '\r\n';
+    });
+
+    icsContent += 'END:VCALENDAR';
+
+    try {
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        
+        const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
+        link.setAttribute('download', `ลบ_${schName}_calendar.ics`);
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('🗑️ ดาวน์โหลดไฟล์ยกเลิกปฏิทินสำเร็จ!');
+        
+        // แนะนำการนำเข้าสู่ Google Calendar เพื่อลบวิชาออก
+        setTimeout(() => {
+            if (confirm('ดาวน์โหลดไฟล์สำหรับลบปฏิทินสำเร็จแล้ว!\n\nสำหรับผู้ใช้งาน Google Calendar ต้องการเปิดหน้าเว็บเพื่อนำเข้าไฟล์นี้เพื่อลบวิชาออกเลยหรือไม่?')) {
+                window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+            }
+        }, 800);
+    } catch (e) {
+        console.error(e);
+        showToast('⚠️ สร้างไฟล์ลบปฏิทินล้มเหลว');
     }
 }
 
@@ -1191,6 +1262,11 @@ function setupEventListeners() {
     const btnExportICS = document.getElementById('btn-export-ics');
     if (btnExportICS) {
         btnExportICS.addEventListener('click', exportToICS);
+    }
+    
+    const btnCancelICS = document.getElementById('btn-cancel-ics');
+    if (btnCancelICS) {
+        btnCancelICS.addEventListener('click', cancelToICS);
     }
     
     const importTrigger = document.getElementById('btn-import-trigger');
