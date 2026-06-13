@@ -1255,57 +1255,57 @@ input:focus, select:focus {
         display: flex;
     }
 
-    body:not(.is-capturing) .timetable-grid.horizontal {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.horizontal {
         grid-template-columns: 80px repeat(24, 65px) !important;
         grid-template-rows: 45px 95px !important;
         min-width: 1640px !important;
     }
 
-    body:not(.is-capturing) .timetable-grid.horizontal [data-day] {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.horizontal [data-day] {
         grid-row: 2 !important;
     }
 
-    body:not(.is-capturing) .timetable-grid.horizontal .time-axis-cell {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.horizontal .time-axis-cell {
         grid-row: 1 !important;
         top: 0;
         font-size: 0.85rem; 
     }
     
-    body:not(.is-capturing) .timetable-grid.horizontal .time-label-header {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.horizontal .time-label-header {
         grid-row: 1 !important;
         grid-column: 1 !important;
         display: flex !important;
     }
 
-    body:not(.is-capturing) .timetable-grid.vertical {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical {
         grid-template-columns: 70px 1fr !important;
         grid-template-rows: 45px repeat(24, 42px) !important;
         min-width: 100% !important;
     }
 
-    body:not(.is-capturing) .timetable-grid.vertical [data-day] {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical [data-day] {
         grid-column: 2 !important;
     }
 
-    body:not(.is-capturing) .timetable-grid.vertical .time-axis-cell {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical .time-axis-cell {
         grid-column: 1 !important;
         left: 0;
         font-size: 0.85rem; 
     }
     
-    body:not(.is-capturing) .timetable-grid.vertical .time-label-header {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical .time-label-header {
         grid-column: 1 !important;
         grid-row: 1 !important;
         display: flex !important;
     }
 
-    body:not(.is-capturing) .timetable-grid[data-active-day="Monday"] [data-day]:not([data-day="Monday"]),
-    body:not(.is-capturing) .timetable-grid[data-active-day="Tuesday"] [data-day]:not([data-day="Tuesday"]),
-    body:not(.is-capturing) .timetable-grid[data-active-day="Wednesday"] [data-day]:not([data-day="Wednesday"]),
-    body:not(.is-capturing) .timetable-grid[data-active-day="Thursday"] [data-day]:not([data-day="Thursday"]),
-    body:not(.is-capturing) .timetable-grid[data-active-day="Friday"] [data-day]:not([data-day="Friday"]),
-    body:not(.is-capturing) .timetable-grid[data-active-day="Saturday"] [data-day]:not([data-day="Saturday"]),
-    body:not(.is-capturing) .timetable-grid[data-active-day="Sunday"] [data-day]:not([data-day="Sunday"]) {
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Monday"] [data-day]:not([data-day="Monday"]),
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Tuesday"] [data-day]:not([data-day="Tuesday"]),
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Wednesday"] [data-day]:not([data-day="Wednesday"]),
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Thursday"] [data-day]:not([data-day="Thursday"]),
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Friday"] [data-day]:not([data-day="Friday"]),
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Saturday"] [data-day]:not([data-day="Saturday"]),
+    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Sunday"] [data-day]:not([data-day="Sunday"]) {
         display: none !important;
     }
 
