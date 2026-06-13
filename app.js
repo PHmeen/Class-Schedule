@@ -177,6 +177,41 @@ function loadSchedules() {
         };
         schedules.push(term1_2569Schedule);
         activeScheduleId = term1_2569Schedule.id;
+    }
+
+    // เพิ่มและอัปเดตตารางเรียนของ ส้มจี๊ด 🍊
+    const somjeedScheduleName = 'ส้มจี๊ด 🍊';
+    if (!schedules.some(s => s.name === somjeedScheduleName)) {
+        const somjeedSchedule = {
+            id: 'sch_somjeed_' + Date.now(),
+            name: somjeedScheduleName,
+            subjects: [
+                {
+                    id: 'sub_somjeed_1',
+                    subjectCode: '324-381',
+                    subjectName: 'SEMINAR IN CHEMISTRY (สัมมนาทางเคมี)',
+                    teacher: 'ทรรศิดา สุขสวัสดิ์, ขวัญฤทัย ธาตุเพ็ชร, นีรนุช ภู่สันติ, เสาวนีย์ ทูลเชื้อ',
+                    day: 'Thursday',
+                    startTime: '13:00',
+                    endTime: '15:50',
+                    room: 'CH202',
+                    color: 'coral'
+                },
+                {
+                    id: 'sub_somjeed_2',
+                    subjectCode: '325-491',
+                    subjectName: 'PROJECT IN CHEMISTRY I (โครงงานทางเคมี 1)',
+                    teacher: 'ขวัญฤทัย ธาตุเพ็ชร',
+                    day: 'Monday',
+                    startTime: '09:00',
+                    endTime: '11:50',
+                    room: 'ไม่ระบุห้องเรียน',
+                    color: 'amber'
+                }
+            ]
+        };
+        schedules.push(somjeedSchedule);
+        activeScheduleId = somjeedSchedule.id;
         saveSchedules();
     }
 
