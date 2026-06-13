@@ -4,125 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academic Timetable - Widget</title>
-    <!-- Google Fonts: Outfit และ Kanit -->
+    <!-- Google Fonts: Outfit, Kanit, Sarabun, Chonburi, Mitr -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Chonburi&family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1.5">
     <style>
-        :root {
-            --bg-primary: #f8fafc;
-            --bg-card: rgba(255, 255, 255, 0.85);
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --border-color: rgba(203, 213, 225, 0.5);
-            --primary: #4f46e5;
-            
-            /* สีประจำวัน */
-            --color-mon: #d97706; 
-            --color-tue: #db2777; 
-            --color-wed: #059669; 
-            --color-thu: #ea580c; 
-            --color-fri: #0891b2; 
-            --color-sat: #7c3aed; 
-            --color-sun: #dc2626; 
-
-            /* สีการ์ดวิชาเรียน */
-            --subject-indigo: rgba(238, 242, 255, 0.9);
-            --subject-indigo-dark: #1e1b4b; 
-            --subject-indigo-border: #4f46e5;
-
-            --subject-emerald: rgba(236, 253, 245, 0.9);
-            --subject-emerald-dark: #022c22; 
-            --subject-emerald-border: #059669;
-
-            --subject-coral: rgba(255, 247, 237, 0.9);
-            --subject-coral-dark: #431407; 
-            --subject-coral-border: #ea580c;
-
-            --subject-amethyst: rgba(250, 245, 255, 0.9);
-            --subject-amethyst-dark: #2e1065; 
-            --subject-amethyst-border: #9333ea;
-
-            --subject-amber: rgba(255, 251, 235, 0.9);
-            --subject-amber-dark: #451a03; 
-            --subject-amber-border: #d97706;
-
-            --border-radius-md: 8px;
-            --border-radius-sm: 4px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: 'Outfit', 'Kanit', sans-serif;
-            background: transparent;
-            color: var(--text-main);
+            padding: 4px !important;
             min-height: 100vh;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4px;
+            overflow: hidden !important;
+            background: transparent !important;
         }
-
-        /* Background Aurora */
-        .aurora-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-            overflow: hidden;
-        }
-
-        .aurora-blob {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.25;
-            z-index: -1;
-        }
-
-        .blob-1 { background-color: #c7d2fe; top: -50px; left: -50px; }
-        .blob-2 { background-color: #fbcfe8; bottom: -50px; right: -50px; }
-
-        /* Widget Container */
-        .widget-container {
+        
+        .app-container {
             width: 100%;
             height: 100vh;
-            max-height: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 10px;
-            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.04);
+            min-height: 100vh;
+            padding: 10px !important;
+            margin: 0 !important;
             display: flex;
             flex-direction: column;
+            border-radius: var(--border-radius-lg);
+            background: rgba(255, 255, 255, 0.82) !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.7) !important;
             gap: 6px;
         }
 
-        /* Widget Header */
         .widget-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
             padding-bottom: 6px;
-            border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
+            width: 100%;
         }
 
         .widget-title {
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--primary);
             display: flex;
@@ -134,203 +60,124 @@
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.8);
-            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
             border-radius: 20px;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        /* Timetable Grid Container */
+        /* Hide actions inside subject cards for widgets */
+        .card-actions {
+            display: none !important;
+        }
+
         .timetable-wrapper {
-            flex-grow: 1;
-            width: 100%;
-            overflow: auto;
             border-radius: var(--border-radius-md);
-            border: 1px solid var(--border-color);
-            background: rgba(255, 255, 255, 0.5);
-            position: relative;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            scrollbar-width: thin;
         }
 
-        .timetable-grid {
-            display: grid;
-            position: relative;
-            grid-template-columns: 50px repeat(24, minmax(32px, 1fr));
-            grid-template-rows: 28px repeat(7, minmax(48px, auto));
-            min-width: 820px;
+        .timetable-grid.horizontal {
+            grid-template-columns: 80px repeat(24, minmax(65px, 1fr));
+            grid-template-rows: 38px repeat(7, minmax(80px, auto));
+            min-width: 1640px; 
             height: 100%;
         }
 
-        .grid-header-cell {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom: 1px solid var(--border-color);
-            border-right: 1.5px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding-left: 6px;
-            font-weight: 700;
-            font-size: 0.72rem;
-            position: sticky;
-            left: 0;
-            z-index: 5;
+        .timetable-grid.horizontal .grid-header-cell {
+            padding-left: 10px;
+            font-size: 0.9rem;
+            border-right: 1.5px solid #cbd5e1;
+            height: 100%;
         }
 
-        .time-label-header {
-            grid-row: 1;
-            grid-column: 1;
-            background-color: #f8fafc;
-            border-bottom: 1.5px solid var(--border-color);
-            border-right: 1.5px solid var(--border-color);
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            justify-content: center;
-            padding-left: 0;
-            position: sticky;
-            top: 0;
-            left: 0;
-            z-index: 6;
+        .timetable-grid.horizontal .time-axis-cell {
+            font-size: 0.8rem;
+            border-right: 1px dashed #e2e8f0;
         }
 
-        /* Day Colors on Header */
-        .day-header-mon { grid-row: 2; grid-column: 1; border-left: 3.5px solid var(--color-mon); color: var(--color-mon) !important; }
-        .day-header-tue { grid-row: 3; grid-column: 1; border-left: 3.5px solid var(--color-tue); color: var(--color-tue) !important; }
-        .day-header-wed { grid-row: 4; grid-column: 1; border-left: 3.5px solid var(--color-wed); color: var(--color-wed) !important; }
-        .day-header-thu { grid-row: 5; grid-column: 1; border-left: 3.5px solid var(--color-thu); color: var(--color-thu) !important; }
-        .day-header-fri { grid-row: 6; grid-column: 1; border-left: 3.5px solid var(--color-fri); color: var(--color-fri) !important; }
-        .day-header-sat { grid-row: 7; grid-column: 1; border-left: 3.5px solid var(--color-sat); color: var(--color-sat) !important; }
-        .day-header-sun { grid-row: 8; grid-column: 1; border-left: 3.5px solid var(--color-sun); color: var(--color-sun) !important; }
-
-        /* Time axis top cells */
-        .time-axis-cell {
-            grid-row: 1;
-            background-color: #f8fafc;
-            border-bottom: 1.5px solid var(--border-color);
-            border-right: 1px dashed rgba(226, 232, 240, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            position: sticky;
-            top: 0;
-            z-index: 4;
+        .timetable-grid.horizontal .time-label-header {
+            font-size: 0.75rem;
+            border-right: 1.5px solid #cbd5e1;
         }
 
-        .grid-cell {
-            border-right: 1px dashed rgba(241, 245, 249, 0.7);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        .timetable-grid.horizontal .grid-cell {
+            border-right: 1px dashed #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .grid-cell.hour-line {
-            border-right: 1px solid var(--border-color);
+        .timetable-grid.horizontal .grid-cell.hour-line {
+            border-right: 1px solid #cbd5e1;
         }
 
-        /* Subject mini cards */
+        /* Subject card typography scaled down slightly for widget */
         .subject-card {
-            border-radius: var(--border-radius-sm);
-            padding: 4px;
-            position: relative;
-            border: 1px solid transparent;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            margin: 1px;
-            overflow: hidden;
-            z-index: 2;
+            padding: 6px 8px;
+            gap: 3px;
         }
 
-        .card-indigo { background: var(--subject-indigo); color: var(--subject-indigo-dark); border-color: var(--subject-indigo-border); }
-        .card-emerald { background: var(--subject-emerald); color: var(--subject-emerald-dark); border-color: var(--subject-emerald-border); }
-        .card-coral { background: var(--subject-coral); color: var(--subject-coral-dark); border-color: var(--subject-coral-border); }
-        .card-amethyst { background: var(--subject-amethyst); color: var(--subject-amethyst-dark); border-color: var(--subject-amethyst-border); }
-        .card-amber { background: var(--subject-amber); color: var(--subject-amber-dark); border-color: var(--subject-amber-border); }
+        .card-time {
+            font-size: 0.72rem;
+            padding: 1px 4px;
+        }
 
-        .card-code {
-            font-size: 0.58rem;
-            font-weight: 700;
-            opacity: 0.95;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .card-code-badge {
+            font-size: 0.72rem;
+            padding: 1px 4px;
         }
 
         .card-name {
-            font-size: 0.58rem;
-            font-weight: 600;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin: 1px 0;
+            font-size: 0.8rem;
+            line-height: 1.3;
         }
 
-        .card-meta {
-            font-size: 0.52rem;
-            opacity: 0.9;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .card-details {
+            font-size: 0.68rem;
+            padding-top: 3px;
         }
 
         /* Empty State */
         .grid-empty-state {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-muted);
-            font-size: 0.7rem;
-            font-weight: 500;
-            text-align: center;
-            gap: 4px;
-        }
-
-        /* Hide Scrollbar for Web Widget container */
-        .timetable-wrapper::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        .timetable-wrapper::-webkit-scrollbar-thumb {
-            background: rgba(203, 213, 225, 0.8);
-            border-radius: 10px;
-        }
-        .timetable-wrapper::-webkit-scrollbar-track {
-            background: transparent;
+            font-size: 0.85rem !important;
+            padding: 20px !important;
         }
     </style>
 </head>
 <body>
+    <!-- พื้นหลังออโรร่าพริ้วไหว -->
     <div class="aurora-bg">
-        <div class="aurora-blob blob-1"></div>
-        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob aurora-blob-1"></div>
+        <div class="aurora-blob aurora-blob-2"></div>
+        <div class="aurora-blob aurora-blob-3"></div>
     </div>
 
-    <div class="widget-container">
+    <div class="app-container">
         <div class="widget-header">
-            <div class="widget-title">🕒 ตารางเรียนสัปดาห์นี้</div>
+            <div class="widget-title">📅 ตารางเรียนรายสัปดาห์ (Widget)</div>
             <div class="schedule-name" id="schedule-name">ตารางเรียน</div>
         </div>
 
-        <div class="timetable-wrapper">
-            <div class="timetable-grid" id="timetable-grid">
-                <div class="grid-header-cell time-label-header">เวลา/วัน</div>
-                <div class="grid-header-cell day-header-mon">จันทร์</div>
-                <div class="grid-header-cell day-header-tue">อังคาร</div>
-                <div class="grid-header-cell day-header-wed">พุธ</div>
-                <div class="grid-header-cell day-header-thu">พฤหัสฯ</div>
-                <div class="grid-header-cell day-header-fri">ศุกร์</div>
-                <div class="grid-header-cell day-header-sat">เสาร์</div>
-                <div class="grid-header-cell day-header-sun">อาทิตย์</div>
+        <div class="timetable-capture-area" style="padding: 0; background: transparent; border: none; box-shadow: none; height: 100%; display: flex; flex-direction: column;">
+            <div class="timetable-wrapper">
+                <div class="timetable-grid horizontal" id="timetable-weekly-grid">
+                    <div class="grid-header-cell time-label-header">เวลา / วัน</div>
+                    <div class="grid-header-cell day-header-mon" data-day="Monday">จันทร์</div>
+                    <div class="grid-header-cell day-header-tue" data-day="Tuesday">อังคาร</div>
+                    <div class="grid-header-cell day-header-wed" data-day="Wednesday">พุธ</div>
+                    <div class="grid-header-cell day-header-thu" data-day="Thursday">พฤหัสบดี</div>
+                    <div class="grid-header-cell day-header-fri" data-day="Friday">ศุกร์</div>
+                    <div class="grid-header-cell day-header-sat" data-day="Saturday">เสาร์</div>
+                    <div class="grid-header-cell day-header-sun" data-day="Sunday">อาทิตย์</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const START_HOUR = 8;
-        const END_HOUR = 20;
-        const TOTAL_ROWS = (END_HOUR - START_HOUR) * 2;
+        const START_HOUR = 8; 
+        const END_HOUR = 20;  
+        const TOTAL_ROWS = (END_HOUR - START_HOUR) * 2; 
 
         const dayColumnIndices = {
             'Monday': 2, 'Tuesday': 3, 'Wednesday': 4, 'Thursday': 5, 'Friday': 6, 'Saturday': 7, 'Sunday': 8
@@ -340,14 +187,33 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderWidget();
-            // Listen for changes in localStorage from other tabs
+            initWidget();
+            
+            // Sync when data updates in other tabs
             window.addEventListener('storage', (e) => {
-                if (e.key === 'my_schedules_list' || e.key === 'my_active_schedule_id') {
-                    renderWidget();
+                if (e.key === 'my_schedules_list' || e.key === 'my_active_schedule_id' || e.key === 'my_custom_font' || e.key === 'my_custom_bg_base64') {
+                    initWidget();
                 }
             });
         });
+
+        function initWidget() {
+            // Apply customized font and background
+            const fontClass = localStorage.getItem('my_custom_font') || 'font-kanit';
+            document.body.className = '';
+            document.body.classList.add(fontClass);
+
+            const savedBg = localStorage.getItem('my_custom_bg_base64');
+            if (savedBg) {
+                document.body.style.setProperty('--custom-bg-url', `url(${savedBg})`);
+                document.body.classList.add('has-custom-bg');
+            } else {
+                document.body.style.removeProperty('--custom-bg-url');
+                document.body.classList.remove('has-custom-bg');
+            }
+
+            renderWeeklyGrid();
+        }
 
         function getActiveSchedule() {
             const listData = localStorage.getItem('my_schedules_list');
@@ -370,15 +236,15 @@
             return Math.round(minutesSinceStart / 30) + 2;
         }
 
-        function renderWidget() {
-            const grid = document.getElementById('timetable-grid');
+        function renderWeeklyGrid() {
+            const grid = document.getElementById('timetable-weekly-grid');
             if (!grid) return;
 
-            // Remove existing generated elements
+            // Clear old cells
             const elementsToRemove = grid.querySelectorAll('.time-axis-cell, .grid-cell, .subject-card, .grid-empty-state');
             elementsToRemove.forEach(el => el.remove());
 
-            // 1. Create time axis cells (08:00 - 19:00)
+            // 1. Time axis headers
             for (let hour = START_HOUR; hour < END_HOUR; hour++) {
                 const timeCell = document.createElement('div');
                 timeCell.className = 'time-axis-cell';
@@ -389,12 +255,13 @@
                 grid.appendChild(timeCell);
             }
 
-            // 2. Create grid background cells
+            // 2. Background cells
             for (let dayRow = 2; dayRow <= 8; dayRow++) {
                 const dayName = columnIndexToDay[dayRow];
                 for (let slot = 0; slot < TOTAL_ROWS; slot++) {
                     const colNum = slot + 2;
-                    const isHourEnd = (slot % 2 === 1);
+                    const isHourEnd = (slot % 2 === 1); 
+                    
                     const cell = document.createElement('div');
                     cell.className = `grid-cell ${isHourEnd ? 'hour-line' : ''}`;
                     cell.style.gridRow = `${dayRow}`;
@@ -408,7 +275,7 @@
             if (activeSch) {
                 label.innerText = activeSch.name;
             } else {
-                label.innerText = 'ไม่มีตารางเรียน';
+                label.innerText = 'ตารางเรียน';
             }
 
             const subjects = activeSch ? activeSch.subjects : [];
@@ -418,16 +285,28 @@
                 emptyState.className = 'grid-empty-state';
                 emptyState.style.gridColumn = '2 / 26';
                 emptyState.style.gridRow = '2 / 9';
+                emptyState.style.display = 'flex';
+                emptyState.style.flexDirection = 'column';
+                emptyState.style.justifyContent = 'center';
+                emptyState.style.alignItems = 'center';
+                emptyState.style.color = 'var(--text-muted)';
                 emptyState.innerHTML = `
-                    <div style="font-size: 1.2rem;">📅</div>
-                    <div>ตารางเรียนว่างเปล่า</div>
+                    <div style="font-size: 1.8rem; margin-bottom: 8px;">📅</div>
+                    <div style="font-weight: 500;">ตารางเรียนว่างเปล่า</div>
                 `;
                 grid.appendChild(emptyState);
                 return;
             }
 
-            // 3. Render subjects
-            subjects.forEach(sub => {
+            const now = new Date();
+            const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const currentDayNameEn = englishDays[now.getDay()];
+            const currentH = now.getHours();
+            const currentM = now.getMinutes();
+            const currentTimeStr = `${String(currentH).padStart(2, '0')}:${String(currentM).padStart(2, '0')}`;
+
+            // 3. Render subjects with same structure as main website
+            subjects.forEach((sub, index) => {
                 const cardIndex = dayColumnIndices[sub.day];
                 if (!cardIndex) return;
 
@@ -437,13 +316,32 @@
 
                 const card = document.createElement('div');
                 card.className = `subject-card card-${sub.color}`;
+                card.style.setProperty('--delay', index || 0);
                 card.style.gridRow = `${cardIndex}`;
                 card.style.gridColumn = `${startVal} / ${endVal}`;
+                
+                card.setAttribute('data-id', sub.id);
+                card.setAttribute('data-day', sub.day);
+
+                const isActiveClass = (sub.day === currentDayNameEn && 
+                                       currentTimeStr >= sub.startTime && 
+                                       currentTimeStr <= sub.endTime);
+
+                if (isActiveClass) {
+                    card.classList.add('active-now-card');
+                }
 
                 card.innerHTML = `
-                    <div class="card-code">${sub.subjectCode}</div>
-                    <div class="card-name">${sub.subjectName}</div>
-                    <div class="card-meta">📍 ${sub.room || 'ไม่ระบุ'}</div>
+                    <div class="card-header-row">
+                        <span class="card-time">${sub.startTime} - ${sub.endTime}</span>
+                        ${isActiveClass ? `<span class="active-pulse-badge" title="คาบเรียนที่กำลังดำเนินอยู่ขณะนี้"><span class="active-pulse-dot"></span>เรียนอยู่</span>` : ''}
+                        <span class="card-code-badge">${sub.subjectCode}</span>
+                    </div>
+                    <div class="card-name" title="${sub.subjectName}">${sub.subjectName}</div>
+                    <div class="card-details">
+                        ${sub.teacher ? `<span class="card-teacher" title="อาจารย์: ${sub.teacher}">👩‍🏫 ${sub.teacher}</span>` : ''}
+                        <span class="card-room" title="สถานที่: ${sub.room || 'ไม่ระบุห้องเรียน'}">📍 ${sub.room ? sub.room : 'ไม่ระบุห้องเรียน'}</span>
+                    </div>
                 `;
                 grid.appendChild(card);
             });
