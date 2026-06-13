@@ -1250,7 +1250,7 @@ input:focus, select:focus {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .mobile-day-selector {
         display: flex;
     }
