@@ -52,8 +52,10 @@ function initApp() {
     setInterval(updateClock, 1000);
 
     setupEventListeners();
+    initCustomizer();
     render();
 }
+
 
 // โหลดรายชื่อตารางเรียนและข้อมูลวิชาเรียนทั้งหมด (รองรับการโอนย้ายตารางเก่าไม่ให้หาย)
 function loadSchedules() {
@@ -1295,3 +1297,167 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('Service Worker registration failed:', err));
     });
 }
+
+// ==========================================================================
+// PREMIUM VISUAL CUSTOMIZER CONTROLLER
+// ==========================================================================
+function initCustomizer() {
+    const drawer = document.getElementById('customizer-drawer');
+    const btnOpen = document.getElementById('btn-open-customizer');
+    const btnClose = document.getElementById('btn-close-customizer');
+    
+    if (!drawer || !btnOpen || !btnClose) return;
+
+    // 1. Open/Close Drawer
+    btnOpen.addEventListener('click', () => drawer.classList.add('open'));
+    btnClose.addEventListener('click', () => drawer.classList.remove('open'));
+
+    // Close when clicking outside of drawer content
+    window.addEventListener('click', (e) => {
+        if (drawer.classList.contains('open') && 
+            !drawer.contains(e.target) && 
+            e.target !== btnOpen && 
+            !btnOpen.contains(e.target)) {
+            drawer.classList.remove('open');
+        }
+    });
+
+    // 2. Theme Switching
+    const themeRadios = document.querySelectorAll('input[name="custom-theme"]');
+    const currentTheme = localStorage.getItem('my_custom_theme') || 'light';
+    
+    // Set initial theme radio state
+    themeRadios.forEach(radio => {
+        if (radio.value === currentTheme) {
+            radio.checked = true;
+        }
+        radio.addEventListener('change', (e) => {
+            applyTheme(e.target.value);
+        });
+    });
+
+    function applyTheme(theme) {
+        // Remove existing theme classes
+        document.body.classList.remove('theme-dark-glass', 'theme-cyberpunk', 'theme-minimal');
+        
+        if (theme === 'dark') {
+            document.body.classList.add('theme-dark-glass');
+        } else if (theme === 'cyberpunk') {
+            document.body.classList.add('theme-cyberpunk');
+        } else if (theme === 'minimal') {
+            document.body.classList.add('theme-minimal');
+        }
+        
+        localStorage.setItem('my_custom_theme', theme);
+    }
+    
+    // Apply initial theme
+    applyTheme(currentTheme);
+
+    // 3. Font Family Selection
+    const fontSelect = document.getElementById('font-select');
+    const currentFont = localStorage.getItem('my_custom_font') || 'font-kanit';
+    
+    if (fontSelect) {
+        fontSelect.value = currentFont;
+        fontSelect.addEventListener('change', (e) => {
+            applyFont(e.target.value);
+        });
+    }
+
+    function applyFont(fontClass) {
+        document.body.classList.remove('font-kanit', 'font-sarabun', 'font-chonburi', 'font-mitr');
+        document.body.classList.add(fontClass);
+        localStorage.setItem('my_custom_font', fontClass);
+    }
+    
+    applyFont(currentFont);
+
+    // 4. Aurora Speed Slider
+    const speedSlider = document.getElementById('aurora-speed-slider');
+    const speedVal = document.getElementById('aurora-speed-val');
+    const initialSpeed = localStorage.getItem('my_aurora_speed') || '30';
+
+    if (speedSlider && speedVal) {
+        speedSlider.value = initialSpeed;
+        speedVal.innerText = initialSpeed === '0' ? 'Static' : initialSpeed + 's';
+        
+        speedSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            speedVal.innerText = val === '0' ? 'Static' : val + 's';
+            applyAuroraSpeed(val);
+        });
+    }
+
+    function applyAuroraSpeed(speedSec) {
+        const blobs = document.querySelectorAll('.aurora-blob');
+        blobs.forEach((blob, index) => {
+            if (speedSec === '0') {
+                blob.style.animation = 'none';
+            } else {
+                // Keep original base speeds but scale them based on user preference
+                let factor = 1.0;
+                if (index === 0) factor = 25 / 30;
+                else if (index === 1) factor = 30 / 30;
+                else if (index === 2) factor = 28 / 30;
+                
+                const calculatedSpeed = Math.round(Number(speedSec) * factor);
+                blob.style.animation = `drift-${index + 1} ${calculatedSpeed}s infinite alternate ease-in-out`;
+            }
+        });
+        localStorage.setItem('my_aurora_speed', speedSec);
+    }
+    
+    applyAuroraSpeed(initialSpeed);
+
+    // 5. Custom Background Image Upload
+    const btnUploadTrigger = document.getElementById('btn-upload-bg-trigger');
+    const fileInput = document.getElementById('bg-image-upload');
+    const btnReset = document.getElementById('btn-reset-bg');
+    const savedBg = localStorage.getItem('my_custom_bg_base64');
+
+    if (btnUploadTrigger && fileInput) {
+        btnUploadTrigger.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Check size (keep Base64 under ~4MB to avoid localStorage limits)
+            if (file.size > 4 * 1024 * 1024) {
+                showToast('⚠️ ขนาดรูปภาพใหญ่เกินไป (กรุณาเลือกรูปขนาดไม่เกิน 4MB)');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const base64 = event.target.result;
+                applyCustomBg(base64);
+                showToast('🖼️ อัปโหลดและติดตั้งภาพพื้นหลังใหม่แล้ว');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (btnReset) {
+        btnReset.addEventListener('click', () => {
+            document.body.style.removeProperty('--custom-bg-url');
+            document.body.classList.remove('has-custom-bg');
+            btnReset.style.display = 'none';
+            localStorage.removeItem('my_custom_bg_base64');
+            showToast('🗑️ รีเซ็ตภาพพื้นหลังเป็นออริจินัลแล้ว');
+        });
+    }
+
+    function applyCustomBg(base64) {
+        if (!base64) return;
+        document.body.style.setProperty('--custom-bg-url', `url(${base64})`);
+        document.body.classList.add('has-custom-bg');
+        if (btnReset) btnReset.style.display = 'block';
+        localStorage.setItem('my_custom_bg_base64', base64);
+    }
+
+    if (savedBg) {
+        applyCustomBg(savedBg);
+    }
+}
+
