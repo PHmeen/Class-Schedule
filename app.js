@@ -1168,7 +1168,10 @@ function setupEventListeners() {
 
     form.addEventListener('submit', handleFormSubmit);
     document.getElementById('btn-save-image').addEventListener('click', saveAsImage);
-    document.getElementById('btn-load-template').addEventListener('click', loadDemoTemplate);
+    const btnLoadTemplate = document.getElementById('btn-load-template');
+    if (btnLoadTemplate) {
+        btnLoadTemplate.addEventListener('click', loadDemoTemplate);
+    }
     document.getElementById('btn-export').addEventListener('click', exportBackup);
     
     const btnShareLink = document.getElementById('btn-share-link');
