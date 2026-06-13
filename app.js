@@ -1333,37 +1333,9 @@ function initCustomizer() {
         }
     });
 
-    // 2. Theme Switching
-    const themeRadios = document.querySelectorAll('input[name="custom-theme"]');
-    const currentTheme = localStorage.getItem('my_custom_theme') || 'light';
-    
-    // Set initial theme radio state
-    themeRadios.forEach(radio => {
-        if (radio.value === currentTheme) {
-            radio.checked = true;
-        }
-        radio.addEventListener('change', (e) => {
-            applyTheme(e.target.value);
-        });
-    });
+    // Clean up any legacy theme classes if they exist
+    document.body.classList.remove('theme-dark-glass', 'theme-cyberpunk', 'theme-minimal');
 
-    function applyTheme(theme) {
-        // Remove existing theme classes
-        document.body.classList.remove('theme-dark-glass', 'theme-cyberpunk', 'theme-minimal');
-        
-        if (theme === 'dark') {
-            document.body.classList.add('theme-dark-glass');
-        } else if (theme === 'cyberpunk') {
-            document.body.classList.add('theme-cyberpunk');
-        } else if (theme === 'minimal') {
-            document.body.classList.add('theme-minimal');
-        }
-        
-        localStorage.setItem('my_custom_theme', theme);
-    }
-    
-    // Apply initial theme
-    applyTheme(currentTheme);
 
     // 3. Font Family Selection
     const fontSelect = document.getElementById('font-select');
