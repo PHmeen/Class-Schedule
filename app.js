@@ -969,42 +969,43 @@ function copyWidgetShareLink() {
     }
 }
 
+// ตัวแปรและฟังก์ชันช่วยเหลือสำหรับจัดการไฟล์ปฏิทิน (.ics)
+const daysMap = {
+    'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
+    'Thursday': 4, 'Friday': 5, 'Saturday': 6
+};
+
+const icsDays = {
+    'Monday': 'MO', 'Tuesday': 'TU', 'Wednesday': 'WE',
+    'Thursday': 'TH', 'Friday': 'FR', 'Saturday': 'SA', 'Sunday': 'SU'
+};
+
+function getNextWeekdayDate(dayName) {
+    const targetDay = daysMap[dayName];
+    const resultDate = new Date();
+    const currentDay = resultDate.getDay();
+    let distance = targetDay - currentDay;
+    if (distance < 0) {
+        distance += 7; // ไปยังวันของสัปดาห์หน้า
+    }
+    resultDate.setDate(resultDate.getDate() + distance);
+    return resultDate;
+}
+
+function formatICSDate(date, timeStr) {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const [h, m] = timeStr.split(':');
+    return `${yyyy}${mm}${dd}T${h}${m}00`;
+}
+
 // ส่งออกปฏิทินในรูปแบบไฟล์ .ics ที่สามารถนำเข้า Apple Calendar/Google Calendar ได้โดยตรง
 function exportToICS() {
     const activeSch = getActiveSchedule();
     if (!activeSch || activeSch.subjects.length === 0) {
         showToast('⚠️ ไม่มีข้อมูลวิชาเรียนที่สามารถส่งออกปฏิทินได้');
         return;
-    }
-
-    const daysMap = {
-        'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
-        'Thursday': 4, 'Friday': 5, 'Saturday': 6
-    };
-    
-    const icsDays = {
-        'Monday': 'MO', 'Tuesday': 'TU', 'Wednesday': 'WE',
-        'Thursday': 'TH', 'Friday': 'FR', 'Saturday': 'SA', 'Sunday': 'SU'
-    };
-
-    function getNextWeekdayDate(dayName) {
-        const targetDay = daysMap[dayName];
-        const resultDate = new Date();
-        const currentDay = resultDate.getDay();
-        let distance = targetDay - currentDay;
-        if (distance < 0) {
-            distance += 7; // ไปยังวันของสัปดาห์หน้า
-        }
-        resultDate.setDate(resultDate.getDate() + distance);
-        return resultDate;
-    }
-
-    function formatICSDate(date, timeStr) {
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
-        const [h, m] = timeStr.split(':');
-        return `${yyyy}${mm}${dd}T${h}${m}00`;
     }
 
     // กำหนดวันสิ้นสุดการเรียนซ้ำ (ค่าเริ่มต้นคืออีก 5 เดือนนับจากปัจจุบัน)
@@ -1041,6 +1042,7 @@ function exportToICS() {
             'BEGIN:VEVENT',
             `UID:${sub.id}@timetable`,
             `DTSTAMP:${nowStr}`,
+            `SEQUENCE:1`,
             `SUMMARY:${sub.subjectCode} ${sub.subjectName}`,
             `DTSTART;TZID=Asia/Bangkok:${startDateTime}`,
             `DTEND;TZID=Asia/Bangkok:${endDateTime}`,
@@ -1104,12 +1106,26 @@ function cancelToICS() {
         'METHOD:CANCEL'
     ].join('\r\n') + '\r\n';
 
+    // กำหนดวันสิ้นสุดการเรียนซ้ำ (ค่าเริ่มต้นคืออีก 5 เดือนนับจากปัจจุบัน)
+    const untilDate = new Date();
+    untilDate.setMonth(untilDate.getMonth() + 5);
+    const untilStr = untilDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
     activeSch.subjects.forEach(sub => {
+        const startDayDate = getNextWeekdayDate(sub.day);
+        const startDateTime = formatICSDate(startDayDate, sub.startTime);
+        const endDateTime = formatICSDate(startDayDate, sub.endTime);
+        const icsDay = icsDays[sub.day] || 'MO';
+
         icsContent += [
             'BEGIN:VEVENT',
             `UID:${sub.id}@timetable`,
             `DTSTAMP:${nowStr}`,
+            `SEQUENCE:9`,
             `SUMMARY:${sub.subjectCode} ${sub.subjectName}`,
+            `DTSTART;TZID=Asia/Bangkok:${startDateTime}`,
+            `DTEND;TZID=Asia/Bangkok:${endDateTime}`,
+            `RRULE:FREQ=WEEKLY;UNTIL=${untilStr};BYDAY=${icsDay}`,
             `STATUS:CANCELLED`,
             'END:VEVENT'
         ].join('\r\n') + '\r\n';
