@@ -54,6 +54,7 @@ function initApp() {
     setupEventListeners();
     initCustomizer();
     setupOnlineStatusMonitor();
+    setupBulkAdd();
     render();
 }
 
@@ -1914,6 +1915,193 @@ function setupOnlineStatusMonitor() {
 
     // Run initial check
     updateStatus();
+}
+
+// ==========================================================================
+// BULK ADD / QUICK PARSER CONTROLLER
+// ==========================================================================
+let bulkParsedSubjects = [];
+
+function setupBulkAdd() {
+    const btnBulkAdd = document.getElementById('btn-bulk-add');
+    const bulkModal = document.getElementById('bulk-modal');
+    const btnCloseBulk = document.getElementById('btn-close-bulk-modal');
+    const btnCancelBulk = document.getElementById('btn-cancel-bulk');
+    const btnParseBulk = document.getElementById('btn-parse-bulk');
+    const btnConfirmBulk = document.getElementById('btn-confirm-bulk');
+    const bulkInput = document.getElementById('bulk-input-text');
+    const previewSection = document.getElementById('bulk-preview-section');
+    const previewList = document.getElementById('bulk-preview-list');
+    const previewTitle = document.getElementById('bulk-preview-title');
+
+    if (!btnBulkAdd || !bulkModal) return;
+
+    btnBulkAdd.addEventListener('click', () => {
+        bulkInput.value = '';
+        previewSection.style.display = 'none';
+        btnConfirmBulk.style.display = 'none';
+        btnParseBulk.style.display = 'inline-block';
+        bulkParsedSubjects = [];
+        bulkModal.classList.add('show');
+    });
+
+    const closeBulkModal = () => {
+        bulkModal.classList.remove('show');
+    };
+
+    btnCloseBulk.addEventListener('click', closeBulkModal);
+    btnCancelBulk.addEventListener('click', closeBulkModal);
+
+    window.addEventListener('click', (e) => {
+        if (e.target === bulkModal) {
+            closeBulkModal();
+        }
+    });
+
+    btnParseBulk.addEventListener('click', () => {
+        const text = bulkInput.value.trim();
+        if (!text) {
+            showToast('⚠️ กรุณากรอกหรือวางข้อความตารางเรียน');
+            return;
+        }
+
+        bulkParsedSubjects = parseBulkText(text);
+
+        if (bulkParsedSubjects.length === 0) {
+            showToast('❌ ไม่พบข้อมูลรายวิชาเรียนที่สอดคล้อง กรุณาตรวจสอบรูปแบบข้อความ');
+            previewSection.style.display = 'none';
+            btnConfirmBulk.style.display = 'none';
+            return;
+        }
+
+        // Render preview list
+        previewList.innerHTML = '';
+        bulkParsedSubjects.forEach(sub => {
+            const item = document.createElement('div');
+            item.style.padding = '8px';
+            item.style.borderBottom = '1px solid #c8e6c9';
+            item.style.marginBottom = '4px';
+            item.innerHTML = `
+                <strong>[${sub.subjectCode}] ${sub.subjectName}</strong><br>
+                วัน: ${dayNamesTh[sub.day]} เวลา: ${sub.startTime} - ${sub.endTime} น. | ห้อง: ${sub.room} | ผู้สอน: ${sub.teacher || 'ไม่ระบุ'}
+            `;
+            previewList.appendChild(item);
+        });
+
+        previewTitle.innerText = `🔍 ตรวจพบข้อมูลวิชาเรียน (${bulkParsedSubjects.length} วิชา):`;
+        previewSection.style.display = 'block';
+        btnConfirmBulk.style.display = 'inline-block';
+        btnParseBulk.style.display = 'none';
+        showToast(`🔍 ตรวจพบวิชาเรียนสำเร็จ ${bulkParsedSubjects.length} วิชา`);
+    });
+
+    btnConfirmBulk.addEventListener('click', () => {
+        if (bulkParsedSubjects.length === 0) return;
+
+        const activeSch = getActiveSchedule();
+        if (!activeSch) return;
+
+        // Add subjects to current active schedule
+        activeSch.subjects.push(...bulkParsedSubjects);
+        saveSchedules();
+        closeBulkModal();
+        render();
+        showToast(`⚡ เพิ่มวิชาเข้าตารางเรียนสำเร็จ ${bulkParsedSubjects.length} วิชา!`);
+    });
+}
+
+function parseBulkText(text) {
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const parsedSubjects = [];
+    let currentSub = null;
+
+    const codeRegex = /\b(\d{3}-\d{3})\b/;
+    const timeRegex = /\b(\d{1,2})[:.](\d{2})\s*(?:น\.)?\s*[-–—]\s*(\d{1,2})[:.](\d{2})\s*(?:น\.)?\b/;
+    
+    const dayMap = {
+        'จันทร์': 'Monday', 'จ.': 'Monday', 'mon': 'Monday', 'monday': 'Monday',
+        'อังคาร': 'Tuesday', 'อ.': 'Tuesday', 'tue': 'Tuesday', 'tuesday': 'Tuesday',
+        'พุธ': 'Wednesday', 'พ.': 'Wednesday', 'wed': 'Wednesday', 'wednesday': 'Wednesday',
+        'พฤหัสบดี': 'Thursday', 'พฤหัส': 'Thursday', 'พฤ.': 'Thursday', 'thu': 'Thursday', 'thursday': 'Thursday',
+        'ศุกร์': 'Friday', 'ศ.': 'Friday', 'fri': 'Friday', 'friday': 'Friday',
+        'เสาร์': 'Saturday', 'ส.': 'Saturday', 'sat': 'Saturday', 'saturday': 'Saturday',
+        'อาทิตย์': 'Sunday', 'อา.': 'Sunday', 'sun': 'Sunday', 'sunday': 'Sunday'
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const codeMatch = line.match(codeRegex);
+
+        if (codeMatch) {
+            if (currentSub) {
+                parsedSubjects.push(currentSub);
+            }
+
+            const code = codeMatch[1];
+            let name = line.replace(codeRegex, '').trim();
+            
+            if (i + 1 < lines.length && !lines[i + 1].match(codeRegex)) {
+                if (lines[i + 1].includes('วัน/เวลาเรียน') || lines[i + 1].includes('ห้องเรียน') || lines[i + 1].includes('ผู้สอน')) {
+                    // skip
+                } else {
+                    name += ' ' + lines[i + 1];
+                    i++;
+                }
+            }
+
+            currentSub = {
+                id: 'sub_bulk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                subjectCode: code,
+                subjectName: name.replace(/\s+/g, ' ').trim(),
+                teacher: '',
+                day: 'Monday',
+                startTime: '09:00',
+                endTime: '11:50',
+                room: 'ไม่ระบุห้องเรียน',
+                color: ['indigo', 'emerald', 'coral', 'amethyst', 'amber'][parsedSubjects.length % 5]
+            };
+        } else if (currentSub) {
+            let foundDay = null;
+            for (const key in dayMap) {
+                const regex = new RegExp('(?:^|\\s|\\b)' + key + '(?:$|\\s|\\b)', 'i');
+                if (line.match(regex)) {
+                    foundDay = dayMap[key];
+                    break;
+                }
+            }
+
+            const timeMatch = line.match(timeRegex);
+            if (foundDay && timeMatch) {
+                currentSub.day = foundDay;
+                currentSub.startTime = `${String(timeMatch[1]).padStart(2, '0')}:${timeMatch[2]}`;
+                currentSub.endTime = `${String(timeMatch[3]).padStart(2, '0')}:${timeMatch[4]}`;
+
+                let afterTime = line.substring(line.indexOf(timeMatch[0]) + timeMatch[0].length).trim();
+                const roomRegex = /\b(?:[a-zA-Z]{1,4}\d{3,4}(?:\([^)]+\))?|\d{3,4}|ห้อง\s*\d+|Lab\s*\d+|ONLINE|zoom|teams)\b/i;
+                const roomMatch = afterTime.match(roomRegex);
+                
+                if (roomMatch) {
+                    currentSub.room = roomMatch[0];
+                    currentSub.teacher = afterTime.replace(roomRegex, '').replace(/,/g, ', ').replace(/\s+/g, ' ').trim();
+                } else {
+                    currentSub.teacher = afterTime.replace(/,/g, ', ').replace(/\s+/g, ' ').trim();
+                }
+            } else {
+                if (line.includes('-') && line.length > 5) {
+                    const cleanText = line.replace(/[-]/g, '').trim();
+                    if (cleanText.length > 0) {
+                        currentSub.teacher = cleanText;
+                    }
+                }
+            }
+        }
+    }
+
+    if (currentSub) {
+        parsedSubjects.push(currentSub);
+    }
+
+    return parsedSubjects;
 }
 
 

@@ -76,6 +76,12 @@
                         </svg>
                         สร้างตาราง
                     </button>
+                    <button id="btn-bulk-add" class="btn btn-secondary btn-sm" title="เพิ่มหลายวิชาเรียนพร้อมกันจากข้อความ">
+                        <svg class="icon" viewBox="0 0 24 24" style="fill: currentColor; width: 14px; height: 14px;">
+                            <path d="M7 2v11h3v9l7-12h-4l3-8z" />
+                        </svg>
+                        เพิ่มวิชาแบบด่วน
+                    </button>
                     <button id="btn-rename-schedule" class="btn btn-secondary btn-sm" title="เปลี่ยนชื่อตารางเรียนนี้">
                         <svg class="icon" viewBox="0 0 24 24">
                             <path
@@ -147,13 +153,6 @@
                     </button>
                     <input type="file" id="file-import" accept=".json" style="display: none;">
                     
-                    <!-- ปุ่มคัดลอกลิงก์สำหรับ Widget -->
-                    <button id="btn-share-link" class="btn btn-secondary" title="คัดลอกลิงก์ตารางเรียนสำหรับเปิดใช้งานบนแอป Widget">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
-                        </svg>
-                        คัดลอกลิงก์สำหรับ Widget
-                    </button>
                     
                     <!-- ปุ่มส่งออกไปยังปฏิทิน (.ics) -->
                     <button id="btn-export-ics" class="btn btn-secondary" title="ส่งออกตารางเรียนไปยัง Apple/Google Calendar">
@@ -333,6 +332,40 @@
                         <button type="submit" class="btn btn-primary">บันทึกข้อมูลรายวิชา</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Modal สำหรับเพิ่มหลายวิชาเรียนพร้อมกัน (Bulk Add Modal) -->
+        <div id="bulk-modal" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2>⚡ เพิ่มหลายวิชาเรียนพร้อมกัน (Bulk Add)</h2>
+                    <button class="close-modal" id="btn-close-bulk-modal" aria-label="ปิดกล่อง">&times;</button>
+                </div>
+                <div class="modal-form">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 8px;">
+                        วางข้อความตารางเรียนที่คัดลอกมาจากระบบของมหาวิทยาลัย หรือพิมพ์ในรูปแบบ เช่น:<br>
+                        <code>324-381 SEMINAR IN CHEMISTRY พฤหัส 13:00-15:50 CH202</code>
+                    </p>
+                    <div class="form-group">
+                        <label for="bulk-input-text">วางข้อความตารางเรียน:</label>
+                        <textarea id="bulk-input-text" rows="8" placeholder="วางข้อความตารางเรียนที่นี่..." style="width: 100%; padding: 12px; border-radius: var(--border-radius-md); border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.9rem; resize: vertical; outline: none; background-color: #f8fafc; transition: var(--transition-smooth);"></textarea>
+                    </div>
+                    
+                    <!-- ส่วนแสดงรายการวิชาที่ถอดรหัสได้ -->
+                    <div id="bulk-preview-section" style="display: none; border: 1px solid #bbf7d0; background-color: #f0fdf4; border-radius: var(--border-radius-md); padding: 12px; margin-top: 8px;">
+                        <h4 id="bulk-preview-title" style="font-size: 0.88rem; color: #166534; margin-bottom: 6px;">🔍 ตรวจพบข้อมูลวิชาเรียน:</h4>
+                        <div id="bulk-preview-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; font-size: 0.82rem; color: #1e3a1e;">
+                            <!-- พรีวิววิชา -->
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 12px;">
+                        <button type="button" id="btn-cancel-bulk" class="btn btn-secondary">ยกเลิก</button>
+                        <button type="button" id="btn-confirm-bulk" class="btn btn-primary" style="display: none;">เพิ่มเข้าตารางเรียน</button>
+                        <button type="button" id="btn-parse-bulk" class="btn btn-primary">ตรวจสอบข้อความ</button>
+                    </div>
+                </div>
             </div>
         </div>
 
