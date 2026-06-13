@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Timetable - ตารางเรียนระดับพรีเมียม</title>
+    <!-- Google Fonts: Outfit และ Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1.5">
+    <!-- PWA & iOS Safari Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Timetable">
+    <!-- html2canvas ไลบรารีสำหรับเซฟหน้าเว็บเป็นรูปภาพ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <!-- พื้นหลังออโรร่าพริ้วไหว (Dynamic Aurora Background Effect) -->
+    <div class="aurora-bg">
+        <div class="aurora-blob aurora-blob-1"></div>
+        <div class="aurora-blob aurora-blob-2"></div>
+        <div class="aurora-blob aurora-blob-3"></div>
+    </div>
+    
+    <div class="app-container">
+        <!-- Header ส่วนหัวของเว็บ -->
+        <header class="app-header">
+            <div class="header-main">
+                <div class="logo-area">
+                    <div class="logo-icon-wrapper">
+                        <svg class="logo-svg" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 6c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm6 12H6v-1.5c0-1.99 4-3 6-3s6 1.01 6 3V21z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="app-title">Academic Timetable</h1>
+                        <p class="app-subtitle">ระบบตารางเรียนประสิทธิภาพสูง แสดงตารางตามช่วงเวลาจริง ✨</p>
+                    </div>
+                </div>
+                <!-- วันและเวลานาฬิกาเรียบหรู -->
+                <div class="datetime-display" id="current-datetime">
+                    กำลังดึงข้อมูลเวลา...
+                </div>
+            </div>
+
+            <!-- ส่วนควบคุมระบบ -->
+            <div class="header-controls">
+                <!-- ส่วนจัดการหลายตารางเรียน (ปรับใช้ SVG แทนอิโมจิ) -->
+                <div class="schedule-management">
+                    <label for="schedule-select" class="schedule-label">📁 แฟ้มตารางเรียน:</label>
+                    <select id="schedule-select" class="schedule-select" title="เลือกตารางเรียนที่ต้องการเปิดดู"></select>
+                    
+                    <button id="btn-create-schedule" class="btn btn-secondary btn-sm" title="สร้างตารางเรียนใหม่">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        สร้างตาราง
+                    </button>
+                    <button id="btn-rename-schedule" class="btn btn-secondary btn-sm" title="เปลี่ยนชื่อตารางเรียนนี้">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        เปลี่ยนชื่อ
+                    </button>
+                    <button id="btn-delete-schedule" class="btn btn-secondary btn-sm-danger" title="ลบตารางเรียนนี้">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        ลบตาราง
+                    </button>
+                </div>
+
+                <div class="view-toggles">
+                    <button id="toggle-weekly" class="btn-toggle active" onclick="switchView('weekly')">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M19 4H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+                        ตารางเรียนรายสัปดาห์
+                    </button>
+                    <button id="toggle-today" class="btn-toggle" onclick="switchView('today')">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        ตารางสรุปรายวัน
+                    </button>
+                </div>
+                
+                <button id="btn-toggle-orientation" class="btn btn-secondary" title="สลับเลย์เอาต์แนวตั้ง / แนวนอน">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
+                    สลับแนวตั้ง/แนวนอน
+                </button>
+                
+                <div class="backup-controls">
+                    <!-- ปุ่มบันทึกเป็นรูปภาพพรีเมียม -->
+                    <button id="btn-save-image" class="btn btn-primary" title="เซฟตารางเรียนทั้งหมดเป็นรูปภาพ PNG">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v12h14V6H5zm4.5 9L12 11.5l2.5 3.5h-5z"/></svg>
+                        บันทึกตารางเป็นรูปภาพ
+                    </button>
+                    <!-- ปุ่มโหลดตัวอย่างตารางเรียน -->
+                    <button id="btn-load-template" class="btn btn-secondary" title="โหลดตัวอย่างวิชาเรียนเพื่อเริ่มเขียนตาราง">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-6h2v6zm0-8h-2V8h2v2z"/></svg>
+                        โหลดเทมเพลตตัวอย่าง
+                    </button>
+                    <button id="btn-export" class="btn btn-secondary" title="สำรองข้อมูลตารางเรียน">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        ส่งออกข้อมูล
+                    </button>
+                    <button id="btn-import-trigger" class="btn btn-secondary" title="นำเข้าข้อมูลตารางเรียน">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z"/></svg>
+                        นำเข้าข้อมูล
+                    </button>
+                    <input type="file" id="file-import" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </header>
+
+        <!-- แถบปุ่มเลือกวันสำหรับหน้าจอมือถือ -->
+        <nav class="mobile-day-selector" id="mobile-day-tabs">
+            <button class="day-tab active" data-day="Monday">จ.</button>
+            <button class="day-tab" data-day="Tuesday">อ.</button>
+            <button class="day-tab" data-day="Wednesday">พ.</button>
+            <button class="day-tab" data-day="Thursday">พฤ.</button>
+            <button class="day-tab" data-day="Friday">ศ.</button>
+            <button class="day-tab" data-day="Saturday">ส.</button>
+            <button class="day-tab" data-day="Sunday">อา.</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- 1. ตารางเรียนรายสัปดาห์ -->
+            <div id="view-weekly-container" class="view-content active">
+                <div id="timetable-capture-area" class="timetable-capture-area">
+                    <!-- ส่วนหัวการ์ดส่งออก (แสดงเฉพาะในรูปภาพส่งออก หรือตกแต่งด้านบน) -->
+                    <div class="capture-header">
+                        <div class="capture-logo-section">
+                            <div class="capture-logo-icon">🕒</div>
+                            <div>
+                                <h3 class="capture-app-title">Academic Timetable</h3>
+                                <p class="capture-app-subtitle">ตารางเรียนและเวลากิจกรรมประสิทธิภาพสูง ✨</p>
+                            </div>
+                        </div>
+                        <div class="capture-info-section">
+                            <h2 class="capture-schedule-title" id="export-schedule-name">ตารางหลักของฉัน</h2>
+                            <p class="capture-timestamp-subtitle" id="export-schedule-timestamp">ข้อมูลตารางเรียนปัจจุบัน</p>
+                        </div>
+                    </div>
+
+                    <div class="timetable-wrapper">
+                        <div class="timetable-grid" id="timetable-weekly-grid">
+                            <!-- แถวบนสุด: วันจันทร์ - อาทิตย์ -->
+                            <div class="grid-header-cell time-label-header">เวลา / วัน</div>
+                            <div class="grid-header-cell day-header-mon" data-day="Monday">จันทร์</div>
+                            <div class="grid-header-cell day-header-tue" data-day="Tuesday">อังคาร</div>
+                            <div class="grid-header-cell day-header-wed" data-day="Wednesday">พุธ</div>
+                            <div class="grid-header-cell day-header-thu" data-day="Thursday">พฤหัสบดี</div>
+                            <div class="grid-header-cell day-header-fri" data-day="Friday">ศุกร์</div>
+                            <div class="grid-header-cell day-header-sat" data-day="Saturday">เสาร์</div>
+                            <div class="grid-header-cell day-header-sun" data-day="Sunday">อาทิตย์</div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนท้ายการ์ดส่งออก (ลายน้ำ) -->
+                    <div class="capture-footer">
+                        <span>✨ ตารางเรียนระดับพรีเมียม จัดทำและบันทึกโดย Academic Timetable</span>
+                        <span>https://timetable.psu.th</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ตารางสรุปรายวัน -->
+            <div id="view-today-container" class="view-content">
+                <div class="today-planner">
+                    <h2 class="today-title" id="today-view-title">รายการวิชาเรียนวันนี้</h2>
+                    <div class="today-list" id="today-subjects-list">
+                        <!-- วิชาเรียนของวันนี้ -->
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Add Button -->
+        <button id="btn-add-subject" class="btn-floating" title="เพิ่มวิชาเรียนใหม่">
+            <span>+</span>
+        </button>
+
+        <!-- Modal จัดการวิชาเรียน -->
+        <div id="subject-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">จัดการข้อมูลวิชาเรียน</h2>
+                    <button class="close-modal" id="btn-close-modal" aria-label="ปิดกล่อง">&times;</button>
+                </div>
+                <form id="subject-form" class="modal-form">
+                    <input type="hidden" id="subject-id">
+                    
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="subject-code">รหัสวิชา</label>
+                            <input type="text" id="subject-code" placeholder="เช่น CS-211" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject-name">ชื่อวิชา</label>
+                            <input type="text" id="subject-name" placeholder="เช่น Data Structures" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject-teacher">อาจารย์ผู้สอน</label>
+                        <input type="text" id="subject-teacher" placeholder="เช่น รศ.ดร. สมชาย">
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="subject-day">วันเรียน</label>
+                            <select id="subject-day" required>
+                                <option value="Monday">วันจันทร์</option>
+                                <option value="Tuesday">วันอังคาร</option>
+                                <option value="Wednesday">วันพุธ</option>
+                                <option value="Thursday">วันพฤหัสบดี</option>
+                                <option value="Friday">วันศุกร์</option>
+                                <option value="Saturday">วันเสาร์</option>
+                                <option value="Sunday">วันอาทิตย์</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="subject-start">เวลาเริ่มต้น</label>
+                            <input type="time" id="subject-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject-end">เวลาสิ้นสุด</label>
+                            <input type="time" id="subject-end" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject-room">สถานที่เรียน / ลิงก์ห้องเรียน</label>
+                        <input type="text" id="subject-room" placeholder="เช่น ห้อง 405 หรือ ลิงก์ MS Teams">
+                    </div>
+
+                    <!-- ส่วนเลือกแถบสี -->
+                    <div class="form-group">
+                        <label>แถบสีระบุรายวิชา (Color Tag)</label>
+                        <div class="color-picker-wrapper">
+                            <label class="color-option color-indigo" title="Indigo (สีน้ำเงินคราม)">
+                                <input type="radio" name="subject-color" value="indigo" checked>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-emerald" title="Emerald (สีเขียวมรกต)">
+                                <input type="radio" name="subject-color" value="emerald">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-coral" title="Coral (สีส้มปะการัง)">
+                                <input type="radio" name="subject-color" value="coral">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-amethyst" title="Amethyst (สีม่วงอเมทิสต์)">
+                                <input type="radio" name="subject-color" value="amethyst">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="color-option color-amber" title="Amber (สีทองอำพัน)">
+                                <input type="radio" name="subject-color" value="amber">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="btn-cancel" class="btn btn-secondary">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">บันทึกข้อมูลรายวิชา</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast แจ้งเตือนข้อความ -->
+        <div id="toast" class="toast"></div>
+    </div>
+    
+    <script src="app.js?v=1.5"></script>
+</body>
+</html>

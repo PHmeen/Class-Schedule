@@ -1,0 +1,1649 @@
+/* ==========================================================================
+   CSS VARIABLES & PREMIUM THEME CONFIGURATION
+   ========================================================================== */
+:root {
+    --bg-primary: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #0f172a; /* Slate 900 */
+    --text-muted: #475569; /* Slate 600 */
+    --border-color: #cbd5e1;
+    
+    /* สีประจำวันสำหรับเส้นตกแต่ง */
+    --color-mon: #0284c7; 
+    --color-tue: #db2777; 
+    --color-wed: #059669; 
+    --color-thu: #ea580c; 
+    --color-fri: #0891b2; 
+    --color-sat: #7c3aed; 
+    --color-sun: #dc2626; 
+
+    /* สีการ์ดวิชาเรียนสไตล์ Modern UI */
+    --subject-indigo: #eef2ff;
+    --subject-indigo-dark: #1e1b4b; 
+    --subject-indigo-border: #4f46e5;
+
+    --subject-emerald: #ecfdf5;
+    --subject-emerald-dark: #022c22; 
+    --subject-emerald-border: #059669;
+
+    --subject-coral: #fff7ed;
+    --subject-coral-dark: #431407; 
+    --subject-coral-border: #ea580c;
+
+    --subject-amethyst: #faf5ff;
+    --subject-amethyst-dark: #2e1065; 
+    --subject-amethyst-border: #9333ea;
+
+    --subject-amber: #fffbeb;
+    --subject-amber-dark: #451a03; 
+    --subject-amber-border: #d97706;
+
+    /* สีหลัก */
+    --primary: #4f46e5;       
+    --primary-hover: #4338ca; 
+    --secondary: #ffffff;
+    --secondary-hover: #f1f5f9;
+    
+    /* ระบบแสงเงาพรีเมียม */
+    --shadow-soft: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --shadow-card: 0 4px 10px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+    --shadow-hover: 0 20px 25px -5px rgba(79, 70, 229, 0.12), 0 10px 10px -5px rgba(79, 70, 229, 0.04);
+    
+    --border-radius-lg: 16px;
+    --border-radius-md: 10px;
+    --border-radius-sm: 6px;
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   BASE STYLES & FULL SCREEN CONFIGURATION
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* พื้นหลังออโรร่าพริ้วไหวระดับพรีเมียม (Dynamic Aurora Background CSS) */
+.aurora-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    background: #f8fafc;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    pointer-events: none;
+}
+
+.aurora-blob {
+    position: absolute;
+    width: 650px;
+    height: 650px;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.38;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.aurora-blob-1 {
+    background-color: #c7d2fe; /* Indigo */
+    top: -250px;
+    left: -150px;
+    animation: drift-1 25s infinite alternate ease-in-out;
+}
+
+.aurora-blob-2 {
+    background-color: #fbcfe8; /* Pink */
+    bottom: -200px;
+    right: -150px;
+    animation: drift-2 30s infinite alternate ease-in-out;
+}
+
+.aurora-blob-3 {
+    background-color: #d1fae5; /* Emerald */
+    top: 25%;
+    right: 25%;
+    width: 550px;
+    height: 550px;
+    opacity: 0.28;
+    animation: drift-3 28s infinite alternate ease-in-out;
+}
+
+@keyframes drift-1 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(180px, 120px) scale(1.12); }
+    100% { transform: translate(-60px, 240px) scale(0.92); }
+}
+
+@keyframes drift-2 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-240px, -140px) scale(0.88); }
+    100% { transform: translate(120px, 60px) scale(1.18); }
+}
+
+@keyframes drift-3 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-120px, 180px) scale(1.22); }
+    100% { transform: translate(140px, -60px) scale(0.82); }
+}
+
+body {
+    font-family: 'Outfit', 'Kanit', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    background: transparent; /* โปร่งใสเพื่อให้เห็นออโรร่าพริ้วไหวด้านหลัง */
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto; /* ปลดล็อกให้หน้าเว็บสกรอลล์แนวตั้งได้ถ้าจอเตี้ยหรือมือถือ */
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* เพื่อให้เนื้อหายืดตามจริงไม่บีบตัว */
+}
+
+.app-container {
+    width: 100%;
+    max-width: 100%;
+    min-height: calc(100vh - 24px);
+    background: rgba(255, 255, 255, 0.82); /* โปร่งแสงเพื่อเปิดใช้ดีไซน์กระจกฝ้าพรีเมียม */
+    backdrop-filter: blur(35px); /* เบลอฉากหลังออโรร่าสร้างมิติกระจกฝ้า */
+    -webkit-backdrop-filter: blur(35px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: var(--border-radius-lg);
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   HEADER SECTION & MULTI-SCHEDULE (แถบสลับแฟ้มตารางเรียน)
+   ========================================================================== */
+.app-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    padding-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon-wrapper {
+    background: var(--primary);
+    width: 44px;
+    height: 44px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+.logo-svg {
+    width: 22px;
+    height: 22px;
+    fill: #ffffff;
+}
+
+.app-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+}
+
+.app-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.datetime-display {
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    padding: 8px 18px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid #e2e8f0;
+    font-size: 0.95rem; 
+    color: var(--text-main);
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.03);
+}
+
+.header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+}
+
+/* ตกแต่งส่วนจัดการหลายตารางเรียน (Schedule Management Controls) */
+.schedule-management {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid #cbd5e1;
+    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.03);
+}
+
+.schedule-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.schedule-select {
+    padding: 8px 30px 8px 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--border-radius-md);
+    outline: none;
+    cursor: pointer;
+    min-width: 180px;
+    transition: var(--transition-smooth);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23475569'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 20px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.schedule-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+/* ==========================================================================
+   BUTTONS & CONTROLS
+   ========================================================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--border-radius-md);
+    font-family: inherit;
+    font-size: 0.92rem; 
+    font-weight: 600; 
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    outline: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: scale(0.97) translateY(0);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), #6366f1);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-hover), var(--primary));
+    box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    color: var(--text-main);
+    border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-hover);
+    border-color: #94a3b8;
+    box-shadow: 0 4px 8px rgba(15, 23, 42, 0.06);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: var(--border-radius-sm);
+}
+
+.btn-sm-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    background-color: #fff1f2;
+    color: #e11d48;
+    border: 1px solid #fecdd3;
+    transition: var(--transition-smooth);
+    outline: none;
+}
+
+.btn-sm-danger:hover {
+    background-color: #ffe4e6;
+    border-color: #fda4af;
+    color: #be123c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(225, 29, 72, 0.08);
+}
+
+.btn-sm-danger:active {
+    transform: scale(0.97) translateY(0);
+}
+
+.icon {
+    width: 15px;
+    height: 15px;
+    transition: transform 0.2s ease;
+}
+
+.btn:hover .icon {
+    transform: scale(1.1);
+}
+
+.backup-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.view-toggles {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid #e2e8f0;
+    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.03);
+}
+
+.btn-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px; 
+    border: none;
+    background: transparent;
+    border-radius: var(--border-radius-sm);
+    font-family: inherit;
+    font-size: 0.9rem; 
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-toggle.active {
+    background: #ffffff;
+    color: var(--text-main);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+/* ==========================================================================
+   MOBILE DAY SELECTOR
+   ========================================================================== */
+.mobile-day-selector {
+    display: none;
+    gap: 6px;
+    margin-bottom: 12px;
+    background: rgba(241, 245, 249, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 4px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    flex-shrink: 0;
+}
+
+.day-tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    border-radius: var(--border-radius-sm);
+    font-family: inherit;
+    font-size: 0.95rem; 
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    text-align: center;
+}
+
+.day-tab.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* ==========================================================================
+   MAIN VIEW AREA
+   ========================================================================== */
+.app-main {
+    flex: 1;
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+}
+
+.view-content {
+    display: none;
+    height: 100%;
+}
+
+.view-content.active {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    animation: fadeIn 0.15s ease-out;
+}
+
+/* ==========================================================================
+   TIMETABLE SCROLLABLE CONTAINER
+   ========================================================================== */
+.timetable-wrapper {
+    flex: 1;
+    width: 100%;
+    overflow: auto; 
+    border-radius: var(--border-radius-md);
+    border: 1px solid #cbd5e1; 
+    background: #ffffff;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+.timetable-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.timetable-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+.timetable-wrapper::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+    border: 2px solid #ffffff;
+}
+
+.timetable-grid {
+    display: grid;
+    position: relative;
+    transition: var(--transition-smooth);
+}
+
+/* ==========================================================================
+   HORIZONTAL LAYOUT
+   ========================================================================== */
+.timetable-grid.horizontal {
+    grid-template-columns: 100px repeat(24, minmax(65px, 1fr));
+    grid-template-rows: 50px repeat(7, minmax(85px, auto));
+    min-width: 1660px; 
+}
+
+.timetable-grid.horizontal .grid-header-cell {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e2e8f0;
+    border-right: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 14px;
+    font-weight: 700; 
+    font-size: 1.05rem; 
+    color: var(--text-main);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    box-shadow: 2px 0 5px rgba(15, 23, 42, 0.02);
+}
+
+.timetable-grid.horizontal .time-label-header {
+    grid-row: 1;
+    grid-column: 1;
+    background-color: #f8fafc;
+    border-bottom: 2px solid #cbd5e1;
+    border-right: 2px solid #cbd5e1;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    justify-content: center;
+    padding-left: 0;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 6;
+}
+
+.timetable-grid.horizontal .day-header-mon { grid-row: 2; grid-column: 1; border-left: 5px solid var(--color-mon); }
+.timetable-grid.horizontal .day-header-tue { grid-row: 3; grid-column: 1; border-left: 5px solid var(--color-tue); }
+.timetable-grid.horizontal .day-header-wed { grid-row: 4; grid-column: 1; border-left: 5px solid var(--color-wed); }
+.timetable-grid.horizontal .day-header-thu { grid-row: 5; grid-column: 1; border-left: 5px solid var(--color-thu); }
+.timetable-grid.horizontal .day-header-fri { grid-row: 6; grid-column: 1; border-left: 5px solid var(--color-fri); }
+.timetable-grid.horizontal .day-header-sat { grid-row: 7; grid-column: 1; border-left: 5px solid var(--color-sat); }
+.timetable-grid.horizontal .day-header-sun { grid-row: 8; grid-column: 1; border-left: 5px solid var(--color-sun); }
+
+/* แกนเวลาแนวนอนด้านบน */
+.timetable-grid.horizontal .time-axis-cell {
+    grid-row: 1;
+    background-color: #f8fafc;
+    border-bottom: 2px solid #cbd5e1;
+    border-right: 1px dashed #e2e8f0; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    position: sticky;
+    top: 0; 
+    z-index: 4;
+}
+
+.timetable-grid.horizontal .grid-cell {
+    border-right: 1px dashed #f1f5f9; 
+    border-bottom: 1px solid #e2e8f0; 
+}
+
+.timetable-grid.horizontal .grid-cell.hour-line {
+    border-right: 1px solid #cbd5e1; 
+}
+
+/* ==========================================================================
+   VERTICAL LAYOUT
+   ========================================================================== */
+.timetable-grid.vertical {
+    grid-template-columns: 85px repeat(7, minmax(170px, 1fr));
+    grid-template-rows: 54px repeat(24, 42px);
+    min-width: 1275px; 
+}
+
+.timetable-grid.vertical .grid-header-cell {
+    grid-row: 1;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid #e2e8f0;
+    border-right: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700; 
+    font-size: 1.05rem; 
+    color: var(--text-main);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.03);
+}
+
+.timetable-grid.vertical .time-label-header {
+    background-color: #f8fafc;
+    border-right: 2px solid #cbd5e1;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.timetable-grid.vertical .day-header-mon { grid-column: 2; grid-row: 1; border-top: 5px solid var(--color-mon); border-left: none; }
+.timetable-grid.vertical .day-header-tue { grid-column: 3; grid-row: 1; border-top: 5px solid var(--color-tue); border-left: none; }
+.timetable-grid.vertical .day-header-wed { grid-column: 4; grid-row: 1; border-top: 5px solid var(--color-wed); border-left: none; }
+.timetable-grid.vertical .day-header-thu { grid-column: 5; grid-row: 1; border-top: 5px solid var(--color-thu); border-left: none; }
+.timetable-grid.vertical .day-header-fri { grid-column: 6; grid-row: 1; border-top: 5px solid var(--color-fri); border-left: none; }
+.timetable-grid.vertical .day-header-sat { grid-column: 7; grid-row: 1; border-top: 5px solid var(--color-sat); border-left: none; }
+.timetable-grid.vertical .day-header-sun { grid-column: 8; grid-row: 1; border-top: 5px solid var(--color-sun); border-left: none; }
+
+/* แกนเวลาแนวตั้งด้านซ้าย */
+.timetable-grid.vertical .time-axis-cell {
+    grid-column: 1;
+    background-color: #f8fafc;
+    border-right: 2px solid #cbd5e1;
+    border-bottom: 1px solid #cbd5e1; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    position: sticky;
+    left: 0; 
+    z-index: 4;
+}
+
+.timetable-grid.vertical .grid-cell {
+    border-right: 1px solid #e2e8f0; 
+    border-bottom: 1px dashed #f1f5f9; 
+}
+
+.timetable-grid.vertical .grid-cell.hour-line {
+    border-bottom: 1px solid #cbd5e1; 
+}
+
+/* เส้นตารางพฤติกรรมร่วม */
+.grid-cell {
+    grid-row: span 1;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition-smooth);
+}
+
+.grid-cell::after {
+    content: '+';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    opacity: 0;
+    transition: var(--transition-smooth);
+    pointer-events: none;
+}
+
+.grid-cell:hover {
+    background-color: rgba(79, 70, 229, 0.04);
+}
+
+.grid-cell:hover::after {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* ==========================================================================
+   SUBJECT CARDS
+   ========================================================================== */
+.subject-card {
+    border-radius: var(--border-radius-md);
+    padding: 8px 10px; 
+    position: relative;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+    cursor: pointer;
+    margin: 2px 3px;
+    overflow: hidden;
+    z-index: 2;
+    animation: cardEntrance 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation-delay: calc(var(--delay, 0) * 0.04s);
+}
+
+.subject-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    z-index: 10;
+}
+
+.subject-card:active {
+    transform: scale(0.98) translateY(-1px);
+}
+
+.card-indigo { 
+    background-color: var(--subject-indigo);
+    background: linear-gradient(135deg, #ffffff, var(--subject-indigo)); 
+    color: var(--subject-indigo-dark); 
+    border: 1.5px solid var(--subject-indigo-border); 
+}
+.card-indigo:hover {
+    border-color: var(--subject-indigo-border);
+}
+
+.card-emerald { 
+    background-color: var(--subject-emerald);
+    background: linear-gradient(135deg, #ffffff, var(--subject-emerald)); 
+    color: var(--subject-emerald-dark); 
+    border: 1.5px solid var(--subject-emerald-border); 
+}
+.card-emerald:hover {
+    border-color: var(--subject-emerald-border);
+}
+
+.card-coral { 
+    background-color: var(--subject-coral);
+    background: linear-gradient(135deg, #ffffff, var(--subject-coral)); 
+    color: var(--subject-coral-dark); 
+    border: 1.5px solid var(--subject-coral-border); 
+}
+.card-coral:hover {
+    border-color: var(--subject-coral-border);
+}
+
+.card-amethyst { 
+    background-color: var(--subject-amethyst);
+    background: linear-gradient(135deg, #ffffff, var(--subject-amethyst)); 
+    color: var(--subject-amethyst-dark); 
+    border: 1.5px solid var(--subject-amethyst-border); 
+}
+.card-amethyst:hover {
+    border-color: var(--subject-amethyst-border);
+}
+
+.card-amber { 
+    background-color: var(--subject-amber);
+    background: linear-gradient(135deg, #ffffff, var(--subject-amber)); 
+    color: var(--subject-amber-dark); 
+    border: 1.5px solid var(--subject-amber-border); 
+}
+.card-amber:hover {
+    border-color: var(--subject-amber-border);
+}
+
+/* หัวการ์ด */
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+}
+
+.card-time {
+    font-size: 0.78rem; 
+    font-weight: 700;
+    color: inherit;
+    opacity: 0.85;
+    background: rgba(255, 255, 255, 0.8); 
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.card-code-badge {
+    font-size: 0.78rem; 
+    font-weight: 700; 
+    color: inherit;
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.08); 
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 85px; 
+}
+
+/* ชื่อวิชา */
+.card-name {
+    font-size: 0.85rem; 
+    font-weight: 700; 
+    line-height: 1.35;
+    color: inherit;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* ข้อมูลวิชาเรียน */
+.card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: auto;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08); 
+    padding-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.card-teacher, .card-room {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.9;
+}
+
+/* ปุ่มควบคุมการ์ด */
+.card-actions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 3px;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    padding: 3px;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.subject-card:hover .card-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.btn-card-action {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.15);
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn-card-action:hover {
+    border-color: #4f46e5;
+    background: #f8fafc;
+}
+
+.btn-card-action svg {
+    width: 12px;
+    height: 12px;
+    fill: var(--text-main);
+}
+
+/* ==========================================================================
+   TODAY PLANNER (ตารางสรุปรายวัน)
+   ========================================================================== */
+.today-planner {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid #cbd5e1;
+    overflow-y: auto;
+    max-height: 100%;
+    scrollbar-width: thin;
+}
+
+.today-title {
+    font-size: 1.25rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.today-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.today-subject-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid transparent;
+    transition: var(--transition-smooth);
+}
+
+.today-subject-row:hover {
+    transform: translateX(3px);
+}
+
+.today-time-col {
+    font-size: 0.95rem;
+    font-weight: 700;
+    min-width: 100px;
+}
+
+.today-info-col {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.today-subject-name {
+    font-size: 1.05rem; 
+    font-weight: 700;
+}
+
+.today-meta {
+    font-size: 0.85rem; 
+    font-weight: 600;
+    opacity: 1;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   FLOATING ADD BUTTON
+   ========================================================================== */
+.btn-floating {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
+    transition: var(--transition-smooth);
+    z-index: 10;
+}
+
+.btn-floating:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.06) rotate(90deg);
+}
+
+.btn-floating:active {
+    transform: scale(0.95);
+}
+
+.btn-floating span {
+    display: block;
+    margin-top: -3px;
+}
+
+/* ==========================================================================
+   MODAL POPUP
+   ========================================================================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 16px;
+}
+
+.modal.show {
+    display: flex;
+    animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: var(--border-radius-lg);
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #cbd5e1;
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid #cbd5e1;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+}
+
+.modal-header h2 {
+    font-size: 1.2rem; 
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.close-modal {
+    background: #f1f5f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+}
+
+.close-modal:hover {
+    background: #e2e8f0;
+    color: var(--text-main);
+}
+
+.modal-form {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+label {
+    font-size: 0.88rem; 
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+input, select {
+    padding: 10px 14px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid #cbd5e1;
+    font-family: inherit;
+    font-size: 0.95rem; 
+    color: var(--text-main);
+    background-color: #f8fafc;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* Color Picker */
+.color-picker-wrapper {
+    display: flex;
+    gap: 14px;
+    margin-top: 4px;
+}
+
+.color-option {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid #e2e8f0;
+    transition: var(--transition-smooth);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.color-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.color-option input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.color-option .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+}
+
+.color-option input:checked ~ .checkmark {
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--primary);
+}
+
+.color-indigo { background-color: #4f46e5; border-color: rgba(79, 70, 229, 0.2); }
+.color-emerald { background-color: #059669; border-color: rgba(5, 150, 105, 0.2); }
+.color-coral { background-color: #ea580c; border-color: rgba(234, 88, 12, 0.2); }
+.color-amethyst { background-color: #9333ea; border-color: rgba(147, 51, 234, 0.2); }
+.color-amber { background-color: #d97706; border-color: rgba(217, 119, 6, 0.2); }
+
+/* TOAST */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #0f172a;
+    color: white;
+    padding: 10px 18px;
+    border-radius: var(--border-radius-md);
+    font-size: 0.88rem;
+    font-weight: 500;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    opacity: 0;
+    transition: var(--transition-smooth);
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (มือถือ/แท็บเล็ต)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    body {
+        padding: 8px;
+    }
+    
+    .app-container {
+        padding: 12px;
+    }
+    
+    .app-title {
+        font-size: 1.4rem;
+    }
+}
+
+/* Tablet Optimizations (iPad Landscape) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .timetable-grid.horizontal {
+        grid-template-columns: 85px repeat(24, minmax(50px, 1fr)) !important;
+        grid-template-rows: 45px repeat(7, minmax(75px, auto)) !important;
+        min-width: 1285px !important;
+    }
+    
+    .timetable-grid.vertical {
+        grid-template-columns: 75px repeat(7, minmax(130px, 1fr)) !important;
+        grid-template-rows: 45px repeat(24, 38px) !important;
+        min-width: 980px !important;
+    }
+    
+    .subject-card {
+        padding: 6px 8px;
+        gap: 2px;
+    }
+    
+    .card-name {
+        font-size: 0.8rem;
+    }
+    
+    .card-details {
+        font-size: 0.68rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-day-selector {
+        display: flex;
+    }
+
+    body:not(.is-capturing) .timetable-grid.horizontal {
+        grid-template-columns: 80px repeat(24, 65px) !important;
+        grid-template-rows: 45px 95px !important;
+        min-width: 1640px !important;
+    }
+
+    body:not(.is-capturing) .timetable-grid.horizontal [data-day] {
+        grid-row: 2 !important;
+    }
+
+    body:not(.is-capturing) .timetable-grid.horizontal .time-axis-cell {
+        grid-row: 1 !important;
+        top: 0;
+        font-size: 0.85rem; 
+    }
+    
+    body:not(.is-capturing) .timetable-grid.horizontal .time-label-header {
+        grid-row: 1 !important;
+        grid-column: 1 !important;
+        display: flex !important;
+    }
+
+    body:not(.is-capturing) .timetable-grid.vertical {
+        grid-template-columns: 70px 1fr !important;
+        grid-template-rows: 45px repeat(24, 42px) !important;
+        min-width: 100% !important;
+    }
+
+    body:not(.is-capturing) .timetable-grid.vertical [data-day] {
+        grid-column: 2 !important;
+    }
+
+    body:not(.is-capturing) .timetable-grid.vertical .time-axis-cell {
+        grid-column: 1 !important;
+        left: 0;
+        font-size: 0.85rem; 
+    }
+    
+    body:not(.is-capturing) .timetable-grid.vertical .time-label-header {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        display: flex !important;
+    }
+
+    body:not(.is-capturing) .timetable-grid[data-active-day="Monday"] [data-day]:not([data-day="Monday"]),
+    body:not(.is-capturing) .timetable-grid[data-active-day="Tuesday"] [data-day]:not([data-day="Tuesday"]),
+    body:not(.is-capturing) .timetable-grid[data-active-day="Wednesday"] [data-day]:not([data-day="Wednesday"]),
+    body:not(.is-capturing) .timetable-grid[data-active-day="Thursday"] [data-day]:not([data-day="Thursday"]),
+    body:not(.is-capturing) .timetable-grid[data-active-day="Friday"] [data-day]:not([data-day="Friday"]),
+    body:not(.is-capturing) .timetable-grid[data-active-day="Saturday"] [data-day]:not([data-day="Saturday"]),
+    body:not(.is-capturing) .timetable-grid[data-active-day="Sunday"] [data-day]:not([data-day="Sunday"]) {
+        display: none !important;
+    }
+
+    /* จัดสัดส่วนส่วนหัวตารางให้สอดคล้องกับเมนูสลับตารางยาว */
+    .header-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 10px;
+    }
+
+    /* เรียงตารางควบคุมแฟ้มให้อยู่แนวตั้งในมือถือ */
+    .schedule-management {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    
+    .schedule-select {
+        width: 100%;
+    }
+
+    .view-toggles, .backup-controls {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .view-toggles button, .backup-controls button {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .btn-floating {
+        bottom: 24px;
+        right: 24px;
+    }
+
+    /* bottom sheet style for modal on mobile devices */
+    .modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        border: none;
+        border-top: 1px solid #cbd5e1;
+        transform: translateY(100%);
+    }
+
+    .modal.show .modal-content {
+        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+
+/* ==========================================================================
+   TIMETABLE POSTER EXPORT STYLES
+   ========================================================================== */
+.timetable-capture-area {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #faf5ff 100%);
+    border-radius: var(--border-radius-lg);
+    padding: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    min-height: 0; /* แก้บักล็อคสกรอลล์ */
+}
+.capture-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 14px;
+    margin-bottom: 4px;
+}
+
+.capture-logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.capture-logo-icon {
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, var(--primary), #6366f1);
+    color: white;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15);
+}
+
+.capture-app-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.3px;
+}
+
+.capture-app-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.capture-info-section {
+    text-align: right;
+}
+
+.capture-schedule-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+}
+
+.capture-timestamp-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.capture-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px dashed #e2e8f0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* คุณสมบัติปลดล็อกสกรอลล์ขณะส่งออกเป็นรูปภาพ (html2canvas capture overrides) */
+.timetable-capture-area.is-capturing {
+    padding: 10px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #faf5ff 100%) !important;
+}
+
+.timetable-capture-area.is-capturing .capture-header,
+.timetable-capture-area.is-capturing .capture-footer {
+    display: none !important;
+}
+
+.timetable-capture-area.is-capturing .timetable-wrapper {
+    overflow: visible !important;
+    max-height: none !important;
+    max-width: none !important;
+    width: auto !important;
+    height: auto !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* ปิดอนิเมชั่นและการเคลื่อนไหวเมื่อกำลังเซฟรูปภาพ ป้องกันตัวหนังสือจางหรือตำแหน่งเคลื่อนไหวค้าง */
+body.is-capturing .subject-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+.timetable-capture-area.is-capturing .timetable-wrapper::-webkit-scrollbar {
+    display: none !important;
+}
+
+.timetable-capture-area.is-capturing .time-indicator-line {
+    display: none !important; /* ซ่อนเส้นระบุเวลาขณะเซฟภาพ */
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* ==========================================================================
+   INTERACTIVE FEATURES & PULSING GLOWS
+   ========================================================================== */
+/* วิชาที่เรียนอยู่ในปัจจุบัน (Active Now Card) */
+.subject-card.active-now-card {
+    border-width: 2px !important;
+    animation: pulse-glow 2s infinite alternate, cardEntrance 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+}
+
+.subject-card.active-now-card.card-indigo { border-color: #4f46e5 !important; box-shadow: 0 0 16px rgba(79, 70, 229, 0.4) !important; --border-color-glow: rgba(79, 70, 229, 0.5); }
+.subject-card.active-now-card.card-emerald { border-color: #059669 !important; box-shadow: 0 0 16px rgba(5, 150, 105, 0.4) !important; --border-color-glow: rgba(5, 150, 105, 0.5); }
+.subject-card.active-now-card.card-coral { border-color: #ea580c !important; box-shadow: 0 0 16px rgba(234, 88, 12, 0.4) !important; --border-color-glow: rgba(234, 88, 12, 0.5); }
+.subject-card.active-now-card.card-amethyst { border-color: #9333ea !important; box-shadow: 0 0 16px rgba(147, 51, 234, 0.4) !important; --border-color-glow: rgba(147, 51, 234, 0.5); }
+.subject-card.active-now-card.card-amber { border-color: #d97706 !important; box-shadow: 0 0 16px rgba(217, 119, 6, 0.4) !important; --border-color-glow: rgba(217, 119, 6, 0.5); }
+
+.active-pulse-badge {
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+    margin-left: auto;
+}
+
+.active-pulse-dot {
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse-dot 1s infinite alternate;
+}
+
+/* เส้นระบุเวลาปัจจุบันเคลื่อนที่ (Current Time Indicator Line) */
+.time-indicator-line {
+    position: absolute;
+    background-color: #ef4444;
+    pointer-events: none;
+    z-index: 10;
+    transition: all 0.5s ease;
+}
+
+/* เส้นแนวตั้ง (ตารางแนวนอน) */
+.time-indicator-line.vertical-indicator {
+    width: 2px;
+    height: calc(100% - 50px);
+    top: 50px;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* เส้นแนวนอน (ตารางแนวตั้ง) */
+.time-indicator-line.horizontal-indicator {
+    height: 2px;
+    width: calc(100% - 100px);
+    left: 100px;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.time-indicator-dot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #ef4444;
+    border: 2px solid white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #ef4444, 0 0 0 4px rgba(239, 68, 68, 0.3);
+    animation: pulse-ring 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        filter: drop-shadow(0 0 2px var(--border-color-glow));
+    }
+    100% {
+        filter: drop-shadow(0 0 8px var(--border-color-glow));
+    }
+}
+
+@keyframes pulse-dot {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
