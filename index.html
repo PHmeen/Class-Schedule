@@ -47,9 +47,13 @@
                     </div>
                 </div>
                 <!-- วันและเวลานาฬิกาเรียบหรู -->
-                <div class="datetime-display" id="current-datetime">
-                    กำลังดึงข้อมูลเวลา...
+                <div class="datetime-wrapper" style="display: flex; gap: 8px; align-items: center;">
+                    <span id="offline-badge" class="offline-badge" style="display: none;" title="คุณกำลังใช้งานแบบออฟไลน์">📡 ออฟไลน์</span>
+                    <div class="datetime-display" id="current-datetime">
+                        กำลังดึงข้อมูลเวลา...
+                    </div>
                 </div>
+
             </div>
 
             <!-- ส่วนควบคุมระบบ -->

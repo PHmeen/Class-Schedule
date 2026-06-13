@@ -9,8 +9,9 @@
     --border-color: #cbd5e1;
     
     /* สีประจำวันสำหรับเส้นตกแต่ง */
-    --color-mon: #0284c7; 
+    --color-mon: #ffee00; 
     --color-tue: #db2777; 
+
     --color-wed: #059669; 
     --color-thu: #ea580c; 
     --color-fri: #0891b2; 
@@ -2162,4 +2163,54 @@ body.has-custom-bg .aurora-bg {
 body.has-custom-bg .aurora-blob {
     display: none !important; /* Hide blobs so we see the custom background image clearly */
 }
+
+/* ==========================================================================
+   OFFLINE INDICATOR & TOASTS
+   ========================================================================= */
+.offline-badge {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: var(--border-radius-sm);
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: pulse-glow 2s infinite alternate;
+}
+
+/* Offline Custom Toast Styles */
+.toast.toast-offline {
+    background: #ea580c;
+    border-color: #f97316;
+}
+
+/* Online Custom Toast Styles */
+.toast.toast-online {
+    background: #059669;
+    border-color: #10b981;
+}
+
+/* Day Header Text Colors matching Day colors */
+.day-header-mon { color: var(--color-mon) !important; }
+.day-header-tue { color: var(--color-tue) !important; }
+.day-header-wed { color: var(--color-wed) !important; }
+.day-header-thu { color: var(--color-thu) !important; }
+.day-header-fri { color: var(--color-fri) !important; }
+.day-header-sat { color: var(--color-sat) !important; }
+.day-header-sun { color: var(--color-sun) !important; }
+
+/* Mobile Day Tabs active colors matching Day colors */
+.day-tab[data-day="Monday"].active { background-color: var(--color-mon) !important; color: white !important; }
+.day-tab[data-day="Tuesday"].active { background-color: var(--color-tue) !important; color: white !important; }
+.day-tab[data-day="Wednesday"].active { background-color: var(--color-wed) !important; color: white !important; }
+.day-tab[data-day="Thursday"].active { background-color: var(--color-thu) !important; color: white !important; }
+.day-tab[data-day="Friday"].active { background-color: var(--color-fri) !important; color: white !important; }
+.day-tab[data-day="Saturday"].active { background-color: var(--color-sat) !important; color: white !important; }
+.day-tab[data-day="Sunday"].active { background-color: var(--color-sun) !important; color: white !important; }
+
+
 

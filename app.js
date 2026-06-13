@@ -53,8 +53,10 @@ function initApp() {
 
     setupEventListeners();
     initCustomizer();
+    setupOnlineStatusMonitor();
     render();
 }
+
 
 
 // โหลดรายชื่อตารางเรียนและข้อมูลวิชาเรียนทั้งหมด (รองรับการโอนย้ายตารางเก่าไม่ให้หาย)
@@ -1245,15 +1247,24 @@ function updateActiveCards() {
     });
 }
 
-function showToast(message) {
+function showToast(message, type) {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.innerHTML = message;
-    toast.className = 'toast show';
+    
+    // Reset classes and apply type
+    toast.className = 'toast';
+    let extraClass = '';
+    if (type === 'offline') extraClass = ' toast-offline';
+    else if (type === 'online') extraClass = ' toast-online';
+    
+    toast.className = 'toast show' + extraClass;
     
     setTimeout(() => {
         toast.className = 'toast';
-    }, 3000);
+    }, type ? 4000 : 3000);
 }
+
 
 function showUndoToast(message) {
     const toast = document.getElementById('toast');
@@ -1460,4 +1471,30 @@ function initCustomizer() {
         applyCustomBg(savedBg);
     }
 }
+
+function setupOnlineStatusMonitor() {
+    const offlineBadge = document.getElementById('offline-badge');
+    
+    function updateStatus() {
+        if (navigator.onLine) {
+            if (offlineBadge) offlineBadge.style.display = 'none';
+        } else {
+            if (offlineBadge) offlineBadge.style.display = 'inline-flex';
+        }
+    }
+
+    window.addEventListener('online', () => {
+        updateStatus();
+        showToast('📶 เชื่อมต่ออินเทอร์เน็ตแล้ว - ตารางเรียนเข้าสู่โหมดออนไลน์', 'online');
+    });
+
+    window.addEventListener('offline', () => {
+        updateStatus();
+        showToast('📡 ขาดการเชื่อมต่อ - กำลังใช้ข้อมูลตารางเรียนแบบออฟไลน์', 'offline');
+    });
+
+    // Run initial check
+    updateStatus();
+}
+
 
