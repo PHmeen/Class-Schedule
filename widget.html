@@ -142,6 +142,49 @@
             font-size: 0.85rem !important;
             padding: 20px !important;
         }
+
+        /* Force weekly grid layout on all screen sizes in the widget */
+        body:not(.is-capturing) .timetable-grid.horizontal {
+            grid-template-columns: 80px repeat(24, minmax(65px, 1fr)) !important;
+            grid-template-rows: 38px repeat(7, minmax(80px, auto)) !important;
+            min-width: 1640px !important;
+        }
+
+        body:not(.is-capturing) .timetable-grid.horizontal [data-day] {
+            display: flex !important;
+        }
+
+        /* Restore correct grid rows for headers and cards */
+        body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Monday"] { grid-row: 2 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Tuesday"] { grid-row: 3 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Wednesday"] { grid-row: 4 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Thursday"] { grid-row: 5 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Friday"] { grid-row: 6 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Saturday"] { grid-row: 7 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .grid-header-cell[data-day="Sunday"] { grid-row: 8 !important; }
+
+        body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Monday"] { grid-row: 2 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Tuesday"] { grid-row: 3 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Wednesday"] { grid-row: 4 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Thursday"] { grid-row: 5 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Friday"] { grid-row: 6 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Saturday"] { grid-row: 7 !important; }
+        body:not(.is-capturing) .timetable-grid.horizontal .subject-card[data-day="Sunday"] { grid-row: 8 !important; }
+
+        body:not(.is-capturing) .timetable-grid[data-active-day="Monday"] [data-day]:not([data-day="Monday"]),
+        body:not(.is-capturing) .timetable-grid[data-active-day="Tuesday"] [data-day]:not([data-day="Tuesday"]),
+        body:not(.is-capturing) .timetable-grid[data-active-day="Wednesday"] [data-day]:not([data-day="Wednesday"]),
+        body:not(.is-capturing) .timetable-grid[data-active-day="Thursday"] [data-day]:not([data-day="Thursday"]),
+        body:not(.is-capturing) .timetable-grid[data-active-day="Friday"] [data-day]:not([data-day="Friday"]),
+        body:not(.is-capturing) .timetable-grid[data-active-day="Saturday"] [data-day]:not([data-day="Saturday"]),
+        body:not(.is-capturing) .timetable-grid[data-active-day="Sunday"] [data-day]:not([data-day="Sunday"]) {
+            display: flex !important;
+        }
+
+        /* Hide mobile day selector tabs in widget */
+        .mobile-day-selector, #mobile-day-tabs {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
