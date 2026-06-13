@@ -1056,31 +1056,54 @@ function exportToICS() {
     icsContent += 'END:VCALENDAR';
 
     try {
+        const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
+        triggerICSDownload(icsContent, `${schName}_calendar.ics`, true);
+    } catch (e) {
+        console.error(e);
+        showToast('⚠️ ส่งออกปฏิทินล้มเหลว');
+    }
+}
+
+// ฟังก์ชันช่วยเหลือดาวน์โหลดและแจ้งเตือนตามสภาวะระบบปฏิบัติการ (แก้ไขข้อจำกัด iOS PWA / Safari Popup Blocker)
+function triggerICSDownload(icsContent, fileName, isExport) {
+    const isStandalone = (window.navigator.standalone) || (window.matchMedia('(display-mode: standalone)').matches);
+    
+    if (isStandalone) {
+        alert('⚠️ ข้อจำกัดของ iOS/iPadOS (แอปบนหน้าจอโฮม):\n\n' +
+              'การกดเปิดแอปผ่านหน้าจอโฮมจะไม่รองรับการดาวน์โหลดไฟล์ลงเครื่องตรงๆ ครับ\n\n' +
+              'วิธีแก้ไข:\n' +
+              'กรุณาเปิดหน้าเว็บนี้ผ่านแอปเบราว์เซอร์ Safari (https://phmeen.github.io/Class-Schedule/) แล้วกดทำรายการส่งออกหรือลบปฏิทินอีกครั้งครับ');
+        return;
+    }
+
+    try {
         const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        
-        const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
-        link.setAttribute('download', `${schName}_calendar.ics`);
+        link.setAttribute('download', fileName);
         
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast('📅 ส่งออกไฟล์ปฏิทิน (.ics) สำเร็จแล้ว!');
         
-        // แนะนำการนำเข้าสู่ Google Calendar และวิธีการจัดการบน iPad
-        setTimeout(() => {
+        if (isExport) {
+            showToast('📅 ส่งออกไฟล์ปฏิทิน (.ics) สำเร็จแล้ว!');
             alert('💡 ข้อแนะนำสำคัญสำหรับ iPad/iPhone และ Google Calendar:\n\n' +
-                  '1. ตอนกดเปิดไฟล์ปฏิทิน ให้เลือก "สร้างปฏิทินใหม่" (เช่น ตั้งชื่อว่า "ตารางเรียน")\n' +
-                  '2. หากต้องการลบตารางเรียนนี้ออกทั้งหมดในอนาคต คุณสามารถสั่ง "ลบปฏิทิน" นั้นทิ้งได้ทันทีในคลิกเดียว (วิชาทั้งหมดจะหายไปพร้อมกัน ไม่ต้องไล่ลบทีละอันครับ)');
+                  '1. ตอนเปิดไฟล์เพื่อเพิ่มปฏิทิน ให้เลือก "สร้างปฏิทินใหม่" (เช่น ตั้งชื่อว่า "ตารางเรียน")\n' +
+                  '2. หากต้องการลบวิชาเรียนทั้งหมดในภายหลัง คุณสามารถเข้าไปสั่ง "ลบปฏิทิน" นั้นทิ้งได้ทันทีในคลิกเดียว (ทุกวิชาจะถูกถอนออกพร้อมกัน ไม่ต้องนั่งไล่ลบทีละวันครับ)');
             
-            if (confirm('สำหรับผู้ใช้ Google Calendar: คุณต้องการเปิดหน้าเว็บ Google Calendar เพื่อนำเข้าไฟล์ (.ics) เลยหรือไม่?')) {
+            if (confirm('สำหรับผู้ใช้ Google Calendar: ต้องการเปิดหน้าเว็บเพื่อไปนำเข้าไฟล์ (Import) เลยหรือไม่?')) {
                 window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
             }
-        }, 800);
+        } else {
+            showToast('🗑️ ดาวน์โหลดไฟล์ยกเลิกปฏิทินสำเร็จ!');
+            if (confirm('ดาวน์โหลดไฟล์ยกเลิกปฏิทิน (.ics) สำเร็จแล้ว!\n\nสำหรับผู้ใช้ Google Calendar: ต้องการเปิดหน้าเว็บเพื่อนำเข้าไฟล์ยกเลิกนี้เพื่อลบวิชาออกเลยหรือไม่?')) {
+                window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+            }
+        }
     } catch (e) {
         console.error(e);
-        showToast('⚠️ ส่งออกปฏิทินล้มเหลว');
+        showToast('⚠️ ดำเนินการเกี่ยวกับปฏิทินล้มเหลว');
     }
 }
 
@@ -1092,7 +1115,7 @@ function cancelToICS() {
         return;
     }
 
-    if (!confirm('คุณต้องการโหลดไฟล์สำหรับลบวิชาเรียนทั้งหมดนี้ออกจากปฏิทินใช่หรือไม่? (เมื่อดาวน์โหลดแล้วให้เปิดไฟล์เพื่อยืนยันลบในปฏิทินเครื่อง)')) {
+    if (!confirm('คุณต้องการโหลดไฟล์สำหรับลบวิชาเรียนทั้งหมดนี้ออกจากปฏิทินใช่หรือไม่?')) {
         return;
     }
 
@@ -1134,24 +1157,8 @@ function cancelToICS() {
     icsContent += 'END:VCALENDAR';
 
     try {
-        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        
         const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
-        link.setAttribute('download', `ลบ_${schName}_calendar.ics`);
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast('🗑️ ดาวน์โหลดไฟล์ยกเลิกปฏิทินสำเร็จ!');
-        
-        // แนะนำการนำเข้าสู่ Google Calendar เพื่อลบวิชาออก
-        setTimeout(() => {
-            if (confirm('ดาวน์โหลดไฟล์สำหรับลบปฏิทินสำเร็จแล้ว!\n\nสำหรับผู้ใช้งาน Google Calendar ต้องการเปิดหน้าเว็บเพื่อนำเข้าไฟล์นี้เพื่อลบวิชาออกเลยหรือไม่?')) {
-                window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
-            }
-        }, 800);
+        triggerICSDownload(icsContent, `ลบ_${schName}_calendar.ics`, false);
     } catch (e) {
         console.error(e);
         showToast('⚠️ สร้างไฟล์ลบปฏิทินล้มเหลว');
