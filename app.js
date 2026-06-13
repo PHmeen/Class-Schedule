@@ -914,6 +914,61 @@ function exportBackup() {
     showToast('💾 ส่งออกข้อมูล JSON สำเร็จแล้ว');
 }
 
+// สร้างและคัดลอกลิงก์ที่ฝังข้อมูลตารางเรียนสำหรับ Widget
+function copyWidgetShareLink() {
+    const listData = localStorage.getItem('my_schedules_list');
+    const activeId = localStorage.getItem('my_active_schedule_id');
+    const customFont = localStorage.getItem('my_custom_font') || 'font-kanit';
+    const gridOrientation = localStorage.getItem('my_grid_orientation') || 'horizontal';
+    
+    if (!listData) {
+        showToast('⚠️ ไม่พบคลังตารางเรียนที่จะแชร์');
+        return;
+    }
+    
+    try {
+        const payload = {
+            schedules: JSON.parse(listData),
+            activeId: activeId,
+            font: customFont,
+            orientation: gridOrientation
+        };
+        
+        const jsonStr = JSON.stringify(payload);
+        // เข้ารหัส Base64 รองรับภาษาไทย (UTF-8)
+        const b64 = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+        
+        // ลบชื่อไฟล์ท้าย URL หลักออกถ้ามี แล้วเชื่อมด้วย widget.html
+        let baseUrl = window.location.origin + window.location.pathname;
+        if (baseUrl.endsWith('index.html')) {
+            baseUrl = baseUrl.slice(0, -10);
+        }
+        if (!baseUrl.endsWith('/')) {
+            baseUrl += '/';
+        }
+        const shareUrl = `${baseUrl}widget.html?s=${b64}`;
+        
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showToast('🔗 คัดลอกลิงก์สำหรับ Widget แล้ว! วางในแอป Widget ได้เลย');
+        }).catch(err => {
+            console.error('Clipboard error:', err);
+            // Fallback คัดลอกโดยสร้าง Textarea ชั่วคราว
+            const tempInput = document.createElement('textarea');
+            tempInput.value = shareUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('🔗 คัดลอกลิงก์สำหรับ Widget สำเร็จ');
+        });
+    } catch (e) {
+        console.error(e);
+        showToast('⚠️ การเข้ารหัสลิงก์ล้มเหลว');
+    }
+}
+
 function handleImport(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -1022,6 +1077,11 @@ function setupEventListeners() {
     document.getElementById('btn-save-image').addEventListener('click', saveAsImage);
     document.getElementById('btn-load-template').addEventListener('click', loadDemoTemplate);
     document.getElementById('btn-export').addEventListener('click', exportBackup);
+    
+    const btnShareLink = document.getElementById('btn-share-link');
+    if (btnShareLink) {
+        btnShareLink.addEventListener('click', copyWidgetShareLink);
+    }
     
     const importTrigger = document.getElementById('btn-import-trigger');
     const fileImportInput = document.getElementById('file-import');

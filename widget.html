@@ -419,6 +419,35 @@
     </div>
 
 
+    <script>
+        // ตรวจจับลิงก์แชร์ตารางเรียนและดึงข้อมูลมาบันทึกลงความจำเครื่องทันทีก่อนเริ่มรันแอป
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const shareData = params.get('s');
+            if (shareData) {
+                try {
+                    // ถอดรหัส Base64 ภาษาไทย (UTF-8)
+                    const jsonStr = decodeURIComponent(atob(shareData).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    
+                    const payload = JSON.parse(jsonStr);
+                    if (payload && payload.schedules) {
+                        localStorage.setItem('my_schedules_list', JSON.stringify(payload.schedules));
+                        if (payload.activeId) localStorage.setItem('my_active_schedule_id', payload.activeId);
+                        if (payload.font) localStorage.setItem('my_custom_font', payload.font);
+                        if (payload.orientation) localStorage.setItem('my_grid_orientation', payload.orientation);
+                    }
+                    
+                    // ลบพารามิเตอร์ของ URL ทิ้งเพื่อให้หน้าต่าง Widget สวยสะอาดตา
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                } catch (e) {
+                    console.error('Failed to parse share data from URL:', e);
+                }
+            }
+        })();
+    </script>
     <script src="app.js?v=1.5"></script>
     <script>
         // ฟังก์ชันอัปเดตชื่อตารางเรียนในหัว Widget จาก localStorage
