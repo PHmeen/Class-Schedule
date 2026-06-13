@@ -378,6 +378,36 @@
             </div>
         </div>
 
+        <!-- Modal สำหรับเลือกบริการปฏิทิน (Calendar Integration Modal) -->
+        <div id="calendar-modal" class="modal">
+            <div class="modal-content calendar-modal-content">
+                <div class="modal-header">
+                    <h2 id="calendar-modal-title">เลือกบริการปฏิทิน</h2>
+                    <button class="close-modal" id="btn-close-calendar-modal" aria-label="ปิดกล่อง">&times;</button>
+                </div>
+                <div class="calendar-options-grid">
+                    <!-- การ์ดตัวเลือก 1: Apple / Local Calendar -->
+                    <div class="calendar-option-card" id="opt-local-calendar">
+                        <div class="cal-card-icon">📱</div>
+                        <h3 id="cal-local-title">ปฏิทินบนเครื่อง / Apple Calendar</h3>
+                        <p id="cal-local-desc">ดาวน์โหลดไฟล์ .ics เพื่อนำเข้าสู่ปฏิทินของ iPad, iPhone หรือ Outlook ทันที</p>
+                        <button class="btn btn-primary" id="btn-cal-local-action">ดาวน์โหลดไฟล์</button>
+                    </div>
+                    
+                    <!-- การ์ดตัวเลือก 2: Google Calendar -->
+                    <div class="calendar-option-card" id="opt-google-calendar">
+                        <div class="cal-card-icon">🌐</div>
+                        <h3 id="cal-google-title">Google Calendar</h3>
+                        <p id="cal-google-desc">ดาวน์โหลดไฟล์ พร้อมเปิดไปหน้านำเข้าของ Google Calendar บนเบราว์เซอร์</p>
+                        <button class="btn btn-primary" id="btn-cal-google-action">ส่งออกและเปิดเว็บ</button>
+                    </div>
+                </div>
+                <div class="calendar-modal-tip">
+                    <strong>💡 คำแนะนำเพิ่มเติม:</strong> ตอนกดยืนยันเพิ่มในเครื่อง iPad/iPhone แนะนำให้เลือก <u>"สร้างปฏิทินใหม่"</u> (ตั้งชื่อว่า "ตารางเรียน") เพื่อให้ลบออกได้ง่ายภายหลังในคลิกเดียวครับ
+                </div>
+            </div>
+        </div>
+
         <!-- Toast แจ้งเตือนข้อความ -->
         <div id="toast" class="toast"></div>
     </div>

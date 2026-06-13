@@ -1840,5 +1840,79 @@ body.has-custom-bg .aurora-blob {
 .day-tab[data-day="Saturday"].active { background-color: var(--color-sat) !important; color: white !important; }
 .day-tab[data-day="Sunday"].active { background-color: var(--color-sun) !important; color: white !important; }
 
+/* Calendar Modal specific styles */
+.calendar-modal-content {
+    max-width: 580px !important;
+}
+
+.calendar-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 20px;
+}
+
+.calendar-option-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--border-radius-md);
+    padding: 24px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: var(--transition-smooth);
+}
+
+.calendar-option-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--primary);
+}
+
+.cal-card-icon {
+    font-size: 2.8rem;
+    margin-bottom: 4px;
+}
+
+.calendar-option-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.calendar-option-card p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    flex-grow: 1;
+    margin-bottom: 12px;
+}
+
+.calendar-option-card .btn {
+    width: 100%;
+}
+
+.calendar-modal-tip {
+    background: #f0fdf4;
+    border-top: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 14px 20px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .calendar-options-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 12px;
+    }
+    .calendar-option-card {
+        padding: 16px;
+    }
+}
+
 
 

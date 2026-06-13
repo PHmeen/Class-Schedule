@@ -1057,15 +1057,61 @@ function exportToICS() {
 
     try {
         const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
-        triggerICSDownload(icsContent, `${schName}_calendar.ics`, true);
+        triggerICSDownload(icsContent, `${schName}_calendar.ics`, true, target);
     } catch (e) {
         console.error(e);
         showToast('⚠️ ส่งออกปฏิทินล้มเหลว');
     }
 }
 
+// ตัวแปรและฟังก์ชันจัดการกล่องเลือกปฏิทิน (Calendar Modal)
+let calendarActionType = 'export'; // 'export' หรือ 'cancel'
+
+function openCalendarModal(type) {
+    calendarActionType = type;
+    const modal = document.getElementById('calendar-modal');
+    const title = document.getElementById('calendar-modal-title');
+    const localTitle = document.getElementById('cal-local-title');
+    const localDesc = document.getElementById('cal-local-desc');
+    const localActionBtn = document.getElementById('btn-cal-local-action');
+    const googleTitle = document.getElementById('cal-google-title');
+    const googleDesc = document.getElementById('cal-google-desc');
+    const googleActionBtn = document.getElementById('btn-cal-google-action');
+
+    if (!modal) return;
+
+    if (type === 'export') {
+        title.innerText = 'ส่งออกตารางเรียนไปยังปฏิทิน 📅';
+        localTitle.innerText = 'ปฏิทินบนเครื่อง / Apple Calendar';
+        localDesc.innerText = 'ดาวน์โหลดไฟล์ .ics เพื่อนำเข้าสู่ปฏิทินของ iPad, iPhone หรือ Outlook ทันที';
+        localActionBtn.innerText = 'ดาวน์โหลดไฟล์ .ics';
+        
+        googleTitle.innerText = 'Google Calendar';
+        googleDesc.innerText = 'ดาวน์โหลดไฟล์ตารางเรียน พร้อมเปิดหน้านำเข้าปฏิทินกูเกิลผ่านเบราว์เซอร์';
+        googleActionBtn.innerText = 'ส่งออกไป Google Calendar';
+    } else {
+        title.innerText = 'ลบวิชาเรียนออกจากปฏิทิน 🗑️';
+        localTitle.innerText = 'ลบออกจากปฏิทินในเครื่อง';
+        localDesc.innerText = 'ดาวน์โหลดไฟล์ยกเลิกเพื่อสั่งลบวิชาทั้งหมดนี้ออกจาก Apple Calendar หรือ Outlook ของท่าน';
+        localActionBtn.innerText = 'ดาวน์โหลดไฟล์ลบวิชา';
+        
+        googleTitle.innerText = 'ลบออกจาก Google Calendar';
+        googleDesc.innerText = 'ดาวน์โหลดไฟล์ยกเลิก พร้อมเปิดหน้านำเข้าของ Google Calendar เพื่อลบวิชาออกทั้งหมด';
+        googleActionBtn.innerText = 'ลบจาก Google Calendar';
+    }
+
+    modal.classList.add('show');
+}
+window.openCalendarModal = openCalendarModal;
+
+function closeCalendarModal() {
+    const modal = document.getElementById('calendar-modal');
+    if (modal) modal.classList.remove('show');
+}
+window.closeCalendarModal = closeCalendarModal;
+
 // ฟังก์ชันช่วยเหลือดาวน์โหลดและแจ้งเตือนตามสภาวะระบบปฏิบัติการ (แก้ไขข้อจำกัด iOS PWA / Safari Popup Blocker)
-function triggerICSDownload(icsContent, fileName, isExport) {
+function triggerICSDownload(icsContent, fileName, isExport, target = 'local') {
     const isStandalone = (window.navigator.standalone) || (window.matchMedia('(display-mode: standalone)').matches);
     
     if (isStandalone) {
@@ -1088,17 +1134,19 @@ function triggerICSDownload(icsContent, fileName, isExport) {
         
         if (isExport) {
             showToast('📅 ส่งออกไฟล์ปฏิทิน (.ics) สำเร็จแล้ว!');
-            alert('💡 ข้อแนะนำสำคัญสำหรับ iPad/iPhone และ Google Calendar:\n\n' +
-                  '1. ตอนเปิดไฟล์เพื่อเพิ่มปฏิทิน ให้เลือก "สร้างปฏิทินใหม่" (เช่น ตั้งชื่อว่า "ตารางเรียน")\n' +
-                  '2. หากต้องการลบวิชาเรียนทั้งหมดในภายหลัง คุณสามารถเข้าไปสั่ง "ลบปฏิทิน" นั้นทิ้งได้ทันทีในคลิกเดียว (ทุกวิชาจะถูกถอนออกพร้อมกัน ไม่ต้องนั่งไล่ลบทีละวันครับ)');
-            
-            if (confirm('สำหรับผู้ใช้ Google Calendar: ต้องการเปิดหน้าเว็บเพื่อไปนำเข้าไฟล์ (Import) เลยหรือไม่?')) {
+            if (target === 'google') {
                 window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+            } else {
+                alert('💡 ข้อแนะนำสำคัญสำหรับ iPad/iPhone:\n\n' +
+                      '1. ตอนเปิดไฟล์เพื่อเพิ่มปฏิทิน ให้เลือก "สร้างปฏิทินใหม่" (เช่น ตั้งชื่อว่า "ตารางเรียน")\n' +
+                      '2. หากต้องการลบวิชาเรียนทั้งหมดในภายหลัง คุณสามารถเข้าไปสั่ง "ลบปฏิทิน" นั้นทิ้งได้ทันทีในคลิกเดียวครับ');
             }
         } else {
             showToast('🗑️ ดาวน์โหลดไฟล์ยกเลิกปฏิทินสำเร็จ!');
-            if (confirm('ดาวน์โหลดไฟล์ยกเลิกปฏิทิน (.ics) สำเร็จแล้ว!\n\nสำหรับผู้ใช้ Google Calendar: ต้องการเปิดหน้าเว็บเพื่อนำเข้าไฟล์ยกเลิกนี้เพื่อลบวิชาออกเลยหรือไม่?')) {
+            if (target === 'google') {
                 window.open('https://calendar.google.com/calendar/r/settings/export', '_blank');
+            } else {
+                alert('💡 เคล็ดลับ:\n\nเมื่อดาวน์โหลดไฟล์ยกเลิกแล้ว ดับเบิลคลิกเปิดไฟล์เพื่อกดลบวิชาออกจากปฏิทินเครื่องได้เลยครับ');
             }
         }
     } catch (e) {
@@ -1108,14 +1156,10 @@ function triggerICSDownload(icsContent, fileName, isExport) {
 }
 
 // ลบรายวิชาเรียนออกจาก Apple Calendar / Google Calendar ผ่านไฟล์ .ics
-function cancelToICS() {
+function cancelToICS(target = 'local') {
     const activeSch = getActiveSchedule();
     if (!activeSch || activeSch.subjects.length === 0) {
         showToast('⚠️ ไม่มีข้อมูลวิชาเรียนที่จะลบ');
-        return;
-    }
-
-    if (!confirm('คุณต้องการโหลดไฟล์สำหรับลบวิชาเรียนทั้งหมดนี้ออกจากปฏิทินใช่หรือไม่?')) {
         return;
     }
 
@@ -1158,7 +1202,7 @@ function cancelToICS() {
 
     try {
         const schName = activeSch.name.replace(/[^a-zA-Z0-9ก-๙_]/g, '');
-        triggerICSDownload(icsContent, `ลบ_${schName}_calendar.ics`, false);
+        triggerICSDownload(icsContent, `ลบ_${schName}_calendar.ics`, false, target);
     } catch (e) {
         console.error(e);
         showToast('⚠️ สร้างไฟล์ลบปฏิทินล้มเหลว');
@@ -1267,6 +1311,10 @@ function setupEventListeners() {
         if (e.target === modal) {
             closeModal();
         }
+        const calModal = document.getElementById('calendar-modal');
+        if (e.target === calModal) {
+            closeCalendarModal();
+        }
     });
 
     form.addEventListener('submit', handleFormSubmit);
@@ -1284,12 +1332,41 @@ function setupEventListeners() {
     
     const btnExportICS = document.getElementById('btn-export-ics');
     if (btnExportICS) {
-        btnExportICS.addEventListener('click', exportToICS);
+        btnExportICS.addEventListener('click', () => openCalendarModal('export'));
     }
     
     const btnCancelICS = document.getElementById('btn-cancel-ics');
     if (btnCancelICS) {
-        btnCancelICS.addEventListener('click', cancelToICS);
+        btnCancelICS.addEventListener('click', () => openCalendarModal('cancel'));
+    }
+
+    const btnCloseCalendarModal = document.getElementById('btn-close-calendar-modal');
+    if (btnCloseCalendarModal) {
+        btnCloseCalendarModal.addEventListener('click', closeCalendarModal);
+    }
+
+    const btnCalLocalAction = document.getElementById('btn-cal-local-action');
+    if (btnCalLocalAction) {
+        btnCalLocalAction.addEventListener('click', () => {
+            if (calendarActionType === 'export') {
+                exportToICS('local');
+            } else {
+                cancelToICS('local');
+            }
+            closeCalendarModal();
+        });
+    }
+
+    const btnCalGoogleAction = document.getElementById('btn-cal-google-action');
+    if (btnCalGoogleAction) {
+        btnCalGoogleAction.addEventListener('click', () => {
+            if (calendarActionType === 'export') {
+                exportToICS('google');
+            } else {
+                cancelToICS('google');
+            }
+            closeCalendarModal();
+        });
     }
     
     const importTrigger = document.getElementById('btn-import-trigger');
