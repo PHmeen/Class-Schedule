@@ -1419,6 +1419,44 @@ function setupEventListeners() {
     // ปุ่มสลับแนวตั้ง/แนวนอน
     document.getElementById('btn-toggle-orientation').addEventListener('click', toggleGridOrientation);
 
+    // ปุ่มเปิดปิดเมนู Hamburger สำหรับอุปกรณ์ขนาดเล็ก
+    const btnMenuToggle = document.getElementById('btn-menu-toggle');
+    const headerControls = document.querySelector('.header-controls');
+    const navBackdrop = document.getElementById('nav-backdrop');
+
+    if (btnMenuToggle && headerControls && navBackdrop) {
+        btnMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            headerControls.classList.toggle('show-menu');
+            navBackdrop.classList.toggle('show');
+            btnMenuToggle.classList.toggle('active');
+        });
+
+        // ปิดเมนูเมื่อคลิกที่พื้นหลัง (Backdrop)
+        navBackdrop.addEventListener('click', () => {
+            headerControls.classList.remove('show-menu');
+            navBackdrop.classList.remove('show');
+            btnMenuToggle.classList.remove('active');
+        });
+
+        // ปิดเมนูเมื่อคลิกปุ่มต่างๆ ในแถบควบคุม
+        headerControls.querySelectorAll('button, select, input').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.id === 'schedule-select') return;
+                headerControls.classList.remove('show-menu');
+                navBackdrop.classList.remove('show');
+                btnMenuToggle.classList.remove('active');
+            });
+        });
+
+        // ปิดเมนูเมื่อเปลี่ยนตารางเรียน
+        document.getElementById('schedule-select').addEventListener('change', () => {
+            headerControls.classList.remove('show-menu');
+            navBackdrop.classList.remove('show');
+            btnMenuToggle.classList.remove('active');
+        });
+    }
+
     // เปิดใช้งานการคลิกลากเพื่อขยับเลื่อนตาราง (Drag-to-Scroll)
     setupDragToScroll();
     setupTouchSwipe();
