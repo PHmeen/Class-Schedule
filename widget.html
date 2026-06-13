@@ -21,35 +21,78 @@
     <!-- html2canvas ไลบรารีสำหรับเซฟหน้าเว็บเป็นรูปภาพ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* Scale up the entire UI proportionally by increasing the root font-size (since layout uses rem units) */
+        /* Scale up root font-size slightly for legibility */
         html {
-            font-size: 19px !important;
+            font-size: 16.5px !important;
         }
 
-        /* Hide all editing/control elements for the widget mode */
-        .header-controls,
+        /* Hide website controls, float buttons, modal, drawer, and full website header */
+        .app-header,
         .btn-floating,
         .card-actions,
         .customizer-drawer,
         .modal,
         .mobile-day-selector,
+        .capture-header,
+        .capture-footer,
         #toast {
             display: none !important;
         }
 
-        /* Prevent scrolling on the widget body and let container fit the widget window */
+        /* Body styles optimized for widget framing */
         body {
-            padding: 8px !important;
+            padding: 6px !important;
             margin: 0 !important;
             height: 100vh !important;
             overflow: hidden !important;
+            background: transparent !important;
         }
 
+        /* Container style matching iOS glassmorphic widgets */
         .app-container {
-            min-height: calc(100vh - 16px) !important;
-            height: calc(100vh - 16px) !important;
+            min-height: calc(100vh - 12px) !important;
+            height: calc(100vh - 12px) !important;
+            padding: 12px !important;
+            margin: 0 !important;
             display: flex;
             flex-direction: column;
+            border-radius: 22px !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            background: rgba(255, 255, 255, 0.82) !important;
+            backdrop-filter: blur(30px) !important;
+            -webkit-backdrop-filter: blur(30px) !important;
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08) !important;
+            gap: 8px;
+        }
+
+        /* Custom sleek Widget Header */
+        .widget-nano-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            flex-shrink: 0;
+        }
+
+        .widget-logo {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .widget-schedule-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(79, 70, 229, 0.15);
         }
 
         .app-main {
@@ -78,6 +121,18 @@
         .timetable-wrapper {
             flex-grow: 1;
             overflow: auto !important;
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        /* Custom scrollbars for widget wrapper */
+        .timetable-wrapper::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .timetable-wrapper::-webkit-scrollbar-thumb {
+            background-color: rgba(15, 23, 42, 0.12);
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -91,7 +146,13 @@
     </div>
 
     <div class="app-container">
-        <!-- Header ส่วนหัวของเว็บ -->
+        <!-- Widget Header Bar (แสดงเฉพาะในหน้า Widget) -->
+        <div class="widget-nano-header">
+            <div class="widget-logo">🕒 Academic Timetable</div>
+            <div class="widget-schedule-badge" id="widget-active-schedule-name">ตารางเรียน</div>
+        </div>
+
+        <!-- Header ส่วนหัวของเว็บ (จะถูกซ่อนไว้ด้วย CSS) -->
         <header class="app-header">
             <div class="header-main">
                 <div class="logo-area">
@@ -118,7 +179,6 @@
 
             <!-- ส่วนควบคุมระบบ -->
             <div class="header-controls">
-                <!-- ส่วนจัดการหลายตารางเรียน (ปรับใช้ SVG แทนอิโมจิ) -->
                 <div class="schedule-management">
                     <label for="schedule-select" class="schedule-label">📁 แฟ้มตารางเรียน:</label>
                     <select id="schedule-select" class="schedule-select"
@@ -177,43 +237,19 @@
                     สลับแนวตั้ง/แนวนอน
                 </button>
 
-
                 <div class="backup-controls">
-                    <!-- ปุ่มบันทึกเป็นรูปภาพพรีเมียม -->
                     <button id="btn-save-image" class="btn btn-primary" title="เซฟตารางเรียนทั้งหมดเป็นรูปภาพ PNG">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path
-                                d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v12h14V6H5zm4.5 9L12 11.5l2.5 3.5h-5z" />
-                        </svg>
                         บันทึกตารางเป็นรูปภาพ
                     </button>
-                    <!-- ปุ่มโหลดตัวอย่างตารางเรียน -->
-                    <button id="btn-load-template" class="btn btn-secondary"
-                        title="โหลดตัวอย่างวิชาเรียนเพื่อเริ่มเขียนตาราง">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-6h2v6zm0-8h-2V8h2v2z" />
-                        </svg>
-                        โหลดเทมเพลตตัวอย่าง
-                    </button>
-                    <button id="btn-export" class="btn btn-secondary" title="สำรองข้อมูลตารางเรียน">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                        </svg>
-                        ส่งออกข้อมูล
-                    </button>
-                    <button id="btn-import-trigger" class="btn btn-secondary" title="นำเข้าข้อมูลตารางเรียน">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z" />
-                        </svg>
-                        นำเข้าข้อมูล
-                    </button>
+                    <button id="btn-load-template" class="btn btn-secondary">โหลดเทมเพลตตัวอย่าง</button>
+                    <button id="btn-export" class="btn btn-secondary">ส่งออกข้อมูล</button>
+                    <button id="btn-import-trigger" class="btn btn-secondary">นำเข้าข้อมูล</button>
                     <input type="file" id="file-import" accept=".json" style="display: none;">
                 </div>
             </div>
         </header>
 
-        <!-- แถบปุ่มเลือกวันสำหรับหน้าจอมือถือ -->
+        <!-- แถบปุ่มเลือกวันสำหรับหน้าจอมือถือ (จะถูกซ่อนไว้) -->
         <nav class="mobile-day-selector" id="mobile-day-tabs">
             <button class="day-tab active" data-day="Monday">จ.</button>
             <button class="day-tab" data-day="Tuesday">อ.</button>
@@ -375,53 +411,8 @@
             </div>
         </div>
 
-        <!-- Drawer แผงปรับแต่งสไตล์ (Premium Visual Customizer) -->
-        <div id="customizer-drawer" class="customizer-drawer">
-            <div class="drawer-header">
-                <h2>🎨 ปรับแต่งตารางเรียน</h2>
-                <button id="btn-close-customizer" class="close-drawer" aria-label="ปิดกล่อง">&times;</button>
-            </div>
-            <div class="drawer-body">
-
-                <!-- 2. เลือกแบบอักษร -->
-                <div class="customize-section">
-                    <h3>แบบอักษรไทย (Thai Font)</h3>
-                    <select id="font-select" class="customizer-select">
-                        <option value="font-kanit">Kanit (โมเดิร์น มีหัวมน)</option>
-                        <option value="font-sarabun">Sarabun (ทางการ อ่านง่าย)</option>
-                        <option value="font-chonburi">Chonburi (เก๋ไก๋ ย้อนยุค)</option>
-                        <option value="font-mitr">Mitr (ร่วมสมัย ไม่มีหัว)</option>
-                    </select>
-                </div>
-
-                <!-- 3. ความเร็วพื้นหลัง Aurora -->
-                <div class="customize-section" id="aurora-speed-control">
-                    <h3>ความเร็วเคลื่อนไหว Aurora (วินาที)</h3>
-                    <div class="slider-wrapper">
-                        <input type="range" id="aurora-speed-slider" min="0" max="60" value="30" step="5">
-                        <span id="aurora-speed-val">30s</span>
-                    </div>
-                    <p class="section-desc">ปรับเป็น 0 เพื่อให้พื้นหลังออโรร่าหยุดนิ่ง ช่วยประหยัดแบตเตอรี่</p>
-                </div>
-
-                <!-- 4. พื้นหลังรูปภาพส่วนตัว -->
-                <div class="customize-section">
-                    <h3>อัปโหลดภาพพื้นหลังส่วนตัว</h3>
-                    <div class="bg-upload-wrapper">
-                        <button type="button" id="btn-upload-bg-trigger" class="btn btn-secondary btn-sm"
-                            style="width: 100%; margin-bottom: 8px;">
-                            📁 เลือกรูปภาพจากเครื่อง
-                        </button>
-                        <input type="file" id="bg-image-upload" accept="image/*" style="display: none;">
-                        <button type="button" id="btn-reset-bg" class="btn-sm-danger"
-                            style="width: 100%; border-radius: 6px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: none;">
-                            🗑️ ลบพื้นหลังส่วนตัว
-                        </button>
-                    </div>
-                    <p class="section-desc">รูปภาพจะถูกนำไปเบลอเป็นฉากหลังกระจกฝ้าอย่างหรูหรา</p>
-                </div>
-            </div>
-        </div>
+        <!-- Drawer แผงปรับแต่งสไตล์ -->
+        <div id="customizer-drawer" class="customizer-drawer"></div>
 
         <!-- Toast แจ้งเตือนข้อความ -->
         <div id="toast" class="toast"></div>
@@ -430,6 +421,26 @@
 
     <script src="app.js?v=1.5"></script>
     <script>
+        // ฟังก์ชันอัปเดตชื่อตารางเรียนในหัว Widget จาก localStorage
+        function updateWidgetHeader() {
+            const listData = localStorage.getItem('my_schedules_list');
+            const activeId = localStorage.getItem('my_active_schedule_id');
+            const badge = document.getElementById('widget-active-schedule-name');
+            if (listData && badge) {
+                try {
+                    const schedules = JSON.parse(listData);
+                    const activeSch = schedules.find(s => s.id === activeId) || schedules[0];
+                    if (activeSch) {
+                        badge.innerText = activeSch.name;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', updateWidgetHeader);
+
         // รีโหลด Widget อัตโนมัติทันทีที่ตรวจพบการเปลี่ยนแปลงข้อมูลจากหน้าหลัก
         window.addEventListener('storage', (e) => {
             if (e.key === 'my_schedules_list' || 
