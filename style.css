@@ -1892,6 +1892,11 @@ body.has-custom-bg .aurora-blob {
 
 .calendar-option-card .btn {
     width: 100%;
+    font-size: 0.86rem;
+    padding: 8px 10px;
+    white-space: normal;
+    word-break: break-word;
+    height: auto;
 }
 
 .calendar-modal-tip {
