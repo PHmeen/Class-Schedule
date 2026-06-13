@@ -2,11 +2,13 @@ const CACHE_NAME = 'timetable-cache-v1.5';
 const ASSETS = [
   './',
   './index.html',
+  './widget.html',
   './style.css?v=1.5',
   './app.js?v=1.5',
   './manifest.json',
   './logo.svg'
 ];
+
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
