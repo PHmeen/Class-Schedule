@@ -1701,7 +1701,7 @@ function updateClock() {
     updateActiveCards();
 }
 
-// อัปเดตสถานะขอบกะพริบเรืองแสงและป้าย "เรียนอยู่" แบบเรียลไทม์
+// อัปเดตสถานะขอบกะพริบเรืองแสงและป้าย "เรียนอยู่" แบบเรียลไทม์พร้อมแถบความคืบหน้า (Class Progress Bar)
 function updateActiveCards() {
     const now = new Date();
     const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -1724,27 +1724,66 @@ function updateActiveCards() {
                                
         const currentlyHasActive = card.classList.contains('active-now-card');
         
-        if (isActiveClass && !currentlyHasActive) {
-            card.classList.add('active-now-card');
+        if (isActiveClass) {
+            // คำนวณเปอร์เซ็นต์เวลาเรียนที่ผ่านไป และเวลาที่เหลือ
+            const [startH, startM] = sub.startTime.split(':').map(Number);
+            const [endH, endM] = sub.endTime.split(':').map(Number);
             
-            const headerRow = card.querySelector('.card-header-row');
-            if (headerRow && !headerRow.querySelector('.active-pulse-badge')) {
-                const badge = document.createElement('span');
-                badge.className = 'active-pulse-badge';
-                badge.title = 'คาบเรียนที่กำลังดำเนินอยู่ขณะนี้';
-                badge.innerHTML = '<span class="active-pulse-dot"></span>เรียนอยู่';
-                
-                const timeSpan = headerRow.querySelector('.card-time');
-                if (timeSpan) {
-                    timeSpan.insertAdjacentElement('afterend', badge);
-                } else {
-                    headerRow.appendChild(badge);
+            const startTimeMs = new Date(now).setHours(startH, startM, 0, 0);
+            const endTimeMs = new Date(now).setHours(endH, endM, 0, 0);
+            const nowMs = now.getTime();
+            
+            const totalDuration = endTimeMs - startTimeMs;
+            const elapsed = nowMs - startTimeMs;
+            const percentage = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
+            const minutesLeft = Math.ceil((endTimeMs - nowMs) / 60000);
+
+            if (!currentlyHasActive) {
+                card.classList.add('active-now-card');
+            }
+            
+            // อัปเดตหรือสร้างป้าย "เรียนอยู่ (เหลืออีก x นาที)"
+            let badge = card.querySelector('.active-pulse-badge');
+            if (!badge) {
+                const headerRow = card.querySelector('.card-header-row');
+                if (headerRow) {
+                    badge = document.createElement('span');
+                    badge.className = 'active-pulse-badge';
+                    badge.title = 'คาบเรียนที่กำลังดำเนินอยู่ขณะนี้';
+                    
+                    const timeSpan = headerRow.querySelector('.card-time');
+                    if (timeSpan) {
+                        timeSpan.insertAdjacentElement('afterend', badge);
+                    } else {
+                        headerRow.appendChild(badge);
+                    }
                 }
             }
+            if (badge) {
+                badge.innerHTML = `<span class="active-pulse-dot"></span>เรียนอยู่ (เหลืออีก ${minutesLeft} น.)`;
+            }
+
+            // อัปเดตหรือสร้างแถบความคืบหน้าเวลาเรียน (Progress Bar) ท้ายการ์ด
+            let progressBarContainer = card.querySelector('.class-progress-bar-container');
+            if (!progressBarContainer) {
+                progressBarContainer = document.createElement('div');
+                progressBarContainer.className = 'class-progress-bar-container';
+                progressBarContainer.innerHTML = '<div class="class-progress-bar"></div>';
+                card.appendChild(progressBarContainer);
+            }
+            const progressBar = progressBarContainer.querySelector('.class-progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+                progressBarContainer.title = `เรียนผ่านไปแล้ว ${Math.round(percentage)}% (เหลืออีก ${minutesLeft} นาที)`;
+            }
+            
         } else if (!isActiveClass && currentlyHasActive) {
             card.classList.remove('active-now-card');
             const badge = card.querySelector('.active-pulse-badge');
             if (badge) badge.remove();
+            
+            const progressBarContainer = card.querySelector('.class-progress-bar-container');
+            if (progressBarContainer) progressBarContainer.remove();
         }
     });
 }

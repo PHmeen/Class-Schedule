@@ -2055,6 +2055,26 @@ body.is-capturing .subject-card {
     animation: pulse-dot 1s infinite alternate;
 }
 
+/* แถบความคืบหน้าเวลาเรียนภายในคาบเรียนปัจจุบัน */
+.class-progress-bar-container {
+    width: 100%;
+    height: 5px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.class-progress-bar {
+    height: 100%;
+    background: currentColor; /* ใช้สีข้อความของประเภทการ์ดนั้นๆ อัตโนมัติ */
+    border-radius: 4px;
+    transition: width 1s linear;
+    box-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
 /* เส้นระบุเวลาปัจจุบันเคลื่อนที่ (Current Time Indicator Line) */
 .time-indicator-line {
     position: absolute;
