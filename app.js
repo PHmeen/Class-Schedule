@@ -833,6 +833,26 @@ function saveAsImage() {
 
         html2canvas(captureArea, options).then(canvas => {
             try {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                const isStandalone = (window.navigator.standalone) || (window.matchMedia('(display-mode: standalone)').matches);
+                const imgDataUrl = canvas.toDataURL('image/png');
+
+                if (isIOS || isStandalone) {
+                    const imgPreviewModal = document.getElementById('image-preview-modal');
+                    const imgPreviewContainer = document.getElementById('image-preview-container');
+                    
+                    if (imgPreviewModal && imgPreviewContainer) {
+                        imgPreviewContainer.innerHTML = `<img src="${imgDataUrl}" style="width: 100%; height: auto; border-radius: var(--border-radius-sm); display: block; -webkit-touch-callout: default; user-select: auto;">`;
+                        imgPreviewModal.classList.add('show');
+                        showToast('📸 ประมวลผลรูปภาพเสร็จแล้ว! กรุณากดค้างที่รูปภาพเพื่อบันทึก');
+                    } else {
+                        window.open(imgDataUrl, '_blank');
+                    }
+                    cleanupCapture();
+                    return;
+                }
+
                 canvas.toBlob((blob) => {
                     if (!blob) {
                         showToast('⚠️ ไม่สามารถแปลงข้อมูลภาพได้');
@@ -1444,7 +1464,19 @@ function setupEventListeners() {
         if (e.target === calModal) {
             closeCalendarModal();
         }
+        const imgModal = document.getElementById('image-preview-modal');
+        if (e.target === imgModal) {
+            imgModal.classList.remove('show');
+        }
     });
+
+    const btnCloseImageModal = document.getElementById('btn-close-image-modal');
+    if (btnCloseImageModal) {
+        btnCloseImageModal.addEventListener('click', () => {
+            const imgModal = document.getElementById('image-preview-modal');
+            if (imgModal) imgModal.classList.remove('show');
+        });
+    }
 
     form.addEventListener('submit', handleFormSubmit);
     document.getElementById('btn-save-image').addEventListener('click', saveAsImage);

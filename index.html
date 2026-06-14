@@ -11,7 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Chonburi&family=Mitr:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=4.2">
+    <link rel="stylesheet" href="style.css?v=4.3">
     <!-- PWA & iOS Safari Support -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.svg">
@@ -485,13 +485,32 @@
             </div>
         </div>
 
+        <!-- Modal สำหรับแสดงรูปภาพเพื่อบันทึกบน iOS/iPadOS -->
+        <div id="image-preview-modal" class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2>📸 บันทึกรูปภาพตารางเรียน</h2>
+                    <button class="close-modal" id="btn-close-image-modal" aria-label="ปิดกล่อง">&times;</button>
+                </div>
+                <div class="modal-form" style="text-align: center;">
+                    <p style="font-size: 0.9rem; color: var(--text-main); font-weight: 600; margin-bottom: 12px; line-height: 1.5; padding: 0 8px;">
+                        👉 <u>กรุณากดค้างที่รูปภาพด้านล่าง</u> แล้วเลือก<br>
+                        <strong>"บันทึกรูปภาพ" (Save Image)</strong> หรือ <strong>"เพิ่มไปยังแอปรูปภาพ"</strong> เพื่อบันทึกภาพลงในเครื่อง iPad ของคุณ
+                    </p>
+                    <div id="image-preview-container" style="border: 2px dashed rgba(79, 70, 229, 0.3); border-radius: var(--border-radius-md); padding: 8px; background: rgba(255,255,255,0.5); overflow: hidden; display: inline-block; max-width: 100%; box-sizing: border-box;">
+                        <!-- แท็กรูปภาพจริงที่จะใส่ทาง JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Toast แจ้งเตือนข้อความ -->
         <div id="toast" class="toast"></div>
     </div>
 
     <!-- Backdrop (ไม่ใช้งานแล้ว – ถูกแทนที่ด้วย inline collapsible menu) -->
 
-    <script src="app.js?v=4.2"></script>
+    <script src="app.js?v=4.3"></script>
 </body>
 
 </html>
