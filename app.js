@@ -1067,13 +1067,27 @@ function exportToICS(target = 'local', newWindow = null) {
 
     const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
+    // บล็อกระบุไทม์โซนประเทศไทยเพื่อบอก Google/Apple Calendar ให้วางคาบเรียนถูกเวลา (ไม่เลื่อนย้อนหรือเลยไป 7 ชั่วโมง)
+    const timezoneBlock = [
+        'BEGIN:VTIMEZONE',
+        'TZID:Asia/Bangkok',
+        'X-LIC-LOCATION:Asia/Bangkok',
+        'BEGIN:STANDARD',
+        'TZNAME:ICT',
+        'TZOFFSETFROM:+0700',
+        'TZOFFSETTO:+0700',
+        'DTSTART:19700101T000000',
+        'END:STANDARD',
+        'END:VTIMEZONE'
+    ].join('\r\n') + '\r\n';
+
     let icsContent = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
         'PRODID:-//PHATHIT MEEN//Academic Timetable//TH',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH'
-    ].join('\r\n') + '\r\n';
+    ].join('\r\n') + '\r\n' + timezoneBlock;
 
     activeSch.subjects.forEach(sub => {
         const startDayDate = getNextWeekdayDate(sub.day);
@@ -1244,13 +1258,26 @@ function cancelToICS(target = 'local', newWindow = null) {
 
     const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
+    const timezoneBlock = [
+        'BEGIN:VTIMEZONE',
+        'TZID:Asia/Bangkok',
+        'X-LIC-LOCATION:Asia/Bangkok',
+        'BEGIN:STANDARD',
+        'TZNAME:ICT',
+        'TZOFFSETFROM:+0700',
+        'TZOFFSETTO:+0700',
+        'DTSTART:19700101T000000',
+        'END:STANDARD',
+        'END:VTIMEZONE'
+    ].join('\r\n') + '\r\n';
+
     let icsContent = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
         'PRODID:-//PHATHIT MEEN//Academic Timetable//TH',
         'CALSCALE:GREGORIAN',
         'METHOD:CANCEL'
-    ].join('\r\n') + '\r\n';
+    ].join('\r\n') + '\r\n' + timezoneBlock;
 
     // กำหนดวันสิ้นสุดการเรียนซ้ำ (ค่าเริ่มต้นคืออีก 5 เดือนนับจากปัจจุบัน)
     const untilDate = new Date();
