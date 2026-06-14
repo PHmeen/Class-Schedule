@@ -1977,6 +1977,23 @@ body.is-capturing .subject-card {
     transition: none !important;
 }
 
+/* ซ่อนแถบความคืบหน้าเวลาเรียน และป้ายแจ้งเรียนอยู่เมื่อบันทึกเป็นรูปภาพ เพื่อความสะอาดและสวยงามอย่างเป็นทางการ */
+body.is-capturing .class-progress-bar-container,
+body.is-capturing .active-pulse-badge {
+    display: none !important;
+}
+
+/* ปรับแต่งการแสดงผลการ์ดที่กำลังเรียนอยู่เมื่อเซฟรูปภาพ ให้ดูเหมือนการ์ดปกติทั่วไป ไม่เรืองแสงค้างในไฟล์ภาพ */
+body.is-capturing .subject-card.active-now-card {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+    animation: none !important;
+}
+body.is-capturing .subject-card.active-now-card.card-indigo { border-color: var(--subject-indigo-border) !important; }
+body.is-capturing .subject-card.active-now-card.card-emerald { border-color: var(--subject-emerald-border) !important; }
+body.is-capturing .subject-card.active-now-card.card-coral { border-color: var(--subject-coral-border) !important; }
+body.is-capturing .subject-card.active-now-card.card-amethyst { border-color: var(--subject-amethyst-border) !important; }
+body.is-capturing .subject-card.active-now-card.card-amber { border-color: var(--subject-amber-border) !important; }
+
 .timetable-capture-area.is-capturing .timetable-wrapper::-webkit-scrollbar {
     display: none !important;
 }
