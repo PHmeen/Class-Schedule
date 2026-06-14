@@ -876,6 +876,7 @@ body {
     opacity: 1; /* fallback: ต้องมองเห็นได้เสมอก่อน animation */
     animation: cardEntrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     animation-delay: calc(var(--delay, 0) * 0.04s);
+    container-type: inline-size; /* เปิดใช้ Container Queries เพื่อการจัดเลย์เอาต์ยืดหยุ่นตามความกว้างของการ์ด */
 }
 
 .subject-card:hover {
@@ -984,7 +985,8 @@ body {
     font-weight: 700; 
     line-height: 1.35;
     color: inherit;
-    word-break: break-all;
+    word-break: break-word; /* ปรับเพื่อป้องกันสระภาษาไทยฉีกขาด */
+    overflow-wrap: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -1012,6 +1014,46 @@ body {
     align-items: center;
     gap: 4px;
     opacity: 0.9;
+}
+
+/* Container Queries สำหรับการ์ดหน้าแคบ ป้องกันข้อความเบียด/เพี้ยน */
+@container (max-width: 145px) {
+    .card-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+    }
+    .card-time {
+        font-size: 0.7rem;
+        padding: 1px 4px;
+        white-space: normal;
+    }
+    .card-code-badge {
+        font-size: 0.7rem;
+        max-width: 100%;
+        padding: 1px 4px;
+    }
+    .card-name {
+        font-size: 0.78rem;
+        -webkit-line-clamp: 3; /* ให้แสดงชื่อวิชาได้ถึง 3 บรรทัดหากหน้าแคบ */
+    }
+    .card-details {
+        font-size: 0.65rem;
+        gap: 1px;
+    }
+    .active-pulse-badge {
+        font-size: 0.68rem;
+        padding: 1px 4px;
+    }
+}
+
+@container (max-width: 90px) {
+    .card-details {
+        display: none; /* ซ่อนรายละเอียดผู้สอน/ห้องชั่วคราวหากการ์ดแคบมากๆ เพื่อไม่ให้ล้น */
+    }
+    .card-time {
+        display: none; /* ซ่อนเวลาชั่วคราว (ดูได้จากแนวแกนเวลาหลัก) */
+    }
 }
 
 /* ปุ่มควบคุมการ์ด */
@@ -1625,6 +1667,10 @@ input:focus, select:focus {
         min-height: 300px;
     }
 
+    .today-planner {
+        max-height: none !important; /* ให้ยืดเต็มพื้นที่และสกรอลล์ที่หน้าเว็บหลักแทน */
+    }
+
     .timetable-grid.vertical {
         grid-template-columns: 70px repeat(7, minmax(90px, 1fr)) !important;
         grid-template-rows: 45px repeat(24, 38px) !important;
@@ -1697,10 +1743,10 @@ input:focus, select:focus {
     }
 }
 
-/* โหมดแสดงผลวันเดียวบนมือถือขนาดเล็ก (<= 767px) */
+/* โหมดแสดงผลสัปดาห์เต็มรูปบนมือถือขนาดเล็ก (<= 767px) เลื่อนเพื่อดูได้ทั้งหมด */
 @media (max-width: 767px) {
     .mobile-day-selector {
-        display: flex;
+        display: none !important; /* ซ่อนแท็บสลับวันเนื่องจากตารางจะแสดงพร้อมกันทุกวันและเลื่อนดูได้ครบถ้วนแล้ว */
     }
     
     .today-planner {
@@ -1708,15 +1754,12 @@ input:focus, select:focus {
     }
 
     body:not(.widget-mode):not(.is-capturing) .timetable-grid.horizontal {
-        grid-template-columns: 80px repeat(24, 65px) !important;
-        grid-template-rows: 45px 95px !important;
-        min-width: 1640px !important;
+        grid-template-columns: 80px repeat(24, 60px) !important;
+        grid-template-rows: 45px repeat(7, minmax(75px, auto)) !important;
+        min-width: 1520px !important; /* เลื่อนซ้ายขวาเพื่อดูช่วงเวลาจริง */
     }
 
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.horizontal [data-day] {
-        grid-row: 2 !important;
-    }
-
+    /* คืนค่าการจัดแถวของแต่ละวันให้เป็นอิสระเหมือนเดสก์ท็อป */
     body:not(.widget-mode):not(.is-capturing) .timetable-grid.horizontal .time-axis-cell {
         grid-row: 1 !important;
         top: 0;
@@ -1730,13 +1773,9 @@ input:focus, select:focus {
     }
 
     body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical {
-        grid-template-columns: 70px 1fr !important;
-        grid-template-rows: 45px repeat(24, 42px) !important;
-        min-width: 100% !important;
-    }
-
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical [data-day] {
-        grid-column: 2 !important;
+        grid-template-columns: 70px repeat(7, minmax(90px, 1fr)) !important;
+        grid-template-rows: 45px repeat(24, 38px) !important;
+        min-width: 700px !important; /* เลื่อนซ้ายขวาเพื่อดูวันเรียนทั้งหมด และเลื่อนขึ้นลงเพื่อดูเวลา */
     }
 
     body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical .time-axis-cell {
@@ -1750,27 +1789,6 @@ input:focus, select:focus {
         grid-row: 1 !important;
         display: flex !important;
     }
-
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Monday"] [data-day]:not([data-day="Monday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Tuesday"] [data-day]:not([data-day="Tuesday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Wednesday"] [data-day]:not([data-day="Wednesday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Thursday"] [data-day]:not([data-day="Thursday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Friday"] [data-day]:not([data-day="Friday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Saturday"] [data-day]:not([data-day="Saturday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid[data-active-day="Sunday"] [data-day]:not([data-day="Sunday"]) {
-        display: none !important;
-    }
-
-    /* ซ่อนหัวตารางวันอื่นๆ เมื่อแสดงวันเดียวในแนวตั้งบนมือถือ */
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical[data-active-day="Monday"] .grid-header-cell[data-day]:not([data-day="Monday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical[data-active-day="Tuesday"] .grid-header-cell[data-day]:not([data-day="Tuesday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical[data-active-day="Wednesday"] .grid-header-cell[data-day]:not([data-day="Wednesday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical[data-active-day="Thursday"] .grid-header-cell[data-day]:not([data-day="Thursday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical[data-active-day="Friday"] .grid-header-cell[data-day]:not([data-day="Friday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical[data-active-day="Saturday"] .grid-header-cell[data-day]:not([data-day="Saturday"]),
-    body:not(.widget-mode):not(.is-capturing) .timetable-grid.vertical[data-active-day="Sunday"] .grid-header-cell[data-day]:not([data-day="Sunday"]) {
-        display: none !important;
-    }
 }
 
 /* 4. หน้าจอเดสก์ท็อปขนาดกลาง (Laptops/Desktops: 1025px - 1440px) */
@@ -1778,6 +1796,23 @@ input:focus, select:focus {
     .app-container {
         max-width: 1400px;
         margin: 0 auto;
+    }
+}
+@media (min-width: 1025px) and (max-width: 1366px) {
+    .header-controls {
+        gap: 12px;
+    }
+    .menu-section {
+        gap: 6px;
+    }
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.86rem;
+    }
+    .schedule-select {
+        min-width: 140px;
+        font-size: 0.85rem;
+        padding: 6px 24px 6px 10px;
     }
 }
 
