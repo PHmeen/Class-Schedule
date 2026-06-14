@@ -1009,60 +1009,7 @@ function exportBackup() {
     showToast('💾 ส่งออกข้อมูล JSON สำเร็จแล้ว');
 }
 
-// สร้างและคัดลอกลิงก์ที่ฝังข้อมูลตารางเรียนสำหรับ Widget
-function copyWidgetShareLink() {
-    const listData = localStorage.getItem('my_schedules_list');
-    const activeId = localStorage.getItem('my_active_schedule_id');
-    const customFont = localStorage.getItem('my_custom_font') || 'font-kanit';
-    const gridOrientation = localStorage.getItem('my_grid_orientation') || 'horizontal';
-    
-    if (!listData) {
-        showToast('⚠️ ไม่พบคลังตารางเรียนที่จะแชร์');
-        return;
-    }
-    
-    try {
-        const payload = {
-            schedules: JSON.parse(listData),
-            activeId: activeId,
-            font: customFont,
-            orientation: gridOrientation
-        };
-        
-        const jsonStr = JSON.stringify(payload);
-        // เข้ารหัส Base64 รองรับภาษาไทย (UTF-8)
-        const b64 = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-            return String.fromCharCode('0x' + p1);
-        }));
-        
-        // ลบชื่อไฟล์ท้าย URL หลักออกถ้ามี แล้วเชื่อมด้วย widget.html
-        let baseUrl = window.location.origin + window.location.pathname;
-        if (baseUrl.endsWith('index.html')) {
-            baseUrl = baseUrl.slice(0, -10);
-        }
-        if (!baseUrl.endsWith('/')) {
-            baseUrl += '/';
-        }
-        const shareUrl = `${baseUrl}widget.html?s=${b64}`;
-        
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            showToast('🔗 คัดลอกลิงก์สำหรับ Widget แล้ว! วางในแอป Widget ได้เลย');
-        }).catch(err => {
-            console.error('Clipboard error:', err);
-            // Fallback คัดลอกโดยสร้าง Textarea ชั่วคราว
-            const tempInput = document.createElement('textarea');
-            tempInput.value = shareUrl;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            showToast('🔗 คัดลอกลิงก์สำหรับ Widget สำเร็จ');
-        });
-    } catch (e) {
-        console.error(e);
-        showToast('⚠️ การเข้ารหัสลิงก์ล้มเหลว');
-    }
-}
+
 
 // ตัวแปรและฟังก์ชันช่วยเหลือสำหรับจัดการไฟล์ปฏิทิน (.ics)
 const daysMap = {
@@ -1485,11 +1432,7 @@ function setupEventListeners() {
         btnLoadTemplate.addEventListener('click', loadDemoTemplate);
     }
     document.getElementById('btn-export').addEventListener('click', exportBackup);
-    
-    const btnShareLink = document.getElementById('btn-share-link');
-    if (btnShareLink) {
-        btnShareLink.addEventListener('click', copyWidgetShareLink);
-    }
+
     
     const btnExportICS = document.getElementById('btn-export-ics');
     if (btnExportICS) {
@@ -1908,6 +1851,12 @@ if ('serviceWorker' in navigator) {
 // ==========================================================================
 // PREMIUM VISUAL CUSTOMIZER CONTROLLER
 // ==========================================================================
+function openCustomizer() {
+    const drawer = document.getElementById('customizer-drawer');
+    if (drawer) drawer.classList.add('open');
+}
+window.openCustomizer = openCustomizer;
+
 function initCustomizer() {
     const drawer = document.getElementById('customizer-drawer');
     const btnOpen = document.getElementById('btn-open-customizer');
@@ -1916,11 +1865,8 @@ function initCustomizer() {
     if (!drawer || !btnOpen || !btnClose) return;
 
     // 1. Open/Close Drawer
-    btnOpen.addEventListener('click', () => drawer.classList.add('open'));
+    btnOpen.addEventListener('click', openCustomizer);
     btnClose.addEventListener('click', () => drawer.classList.remove('open'));
-
-    // เปิด Customizer Drawer จากภายนอก (เช่น จาก Mobile Quick Bar)
-    window.openCustomizer = () => drawer.classList.add('open');
 
     window.addEventListener('click', (e) => {
         if (drawer.classList.contains('open') && 
@@ -2143,6 +2089,17 @@ function setupBulkAdd() {
         render();
         showToast(`⚡ เพิ่มวิชาเข้าตารางเรียนสำเร็จ ${bulkParsedSubjects.length} วิชา!`);
     });
+
+    const btnInsertSample = document.getElementById('btn-insert-sample-bulk');
+    if (btnInsertSample) {
+        btnInsertSample.addEventListener('click', () => {
+            bulkInput.value = 
+                "308-493 ชุดวิชาแอปพลิเคชันบนอุปกรณ์พกพา จันทร์ 13:00-16:50 BSc0409(LAB) สุขกมล\n" +
+                "308-325 โครงงานทางเทคโนโลยีสารสนเทศ พฤหัสบดี 15:00-18:50 BSc0503/1 น้ำทิพย์\n" +
+                "308-421 การประยุกต์เทคโนโลยีสารสนเทศ ศุกร์ 08:00-09:50 BSc0409 เถกิง";
+            btnParseBulk.click();
+        });
+    }
 }
 
 function parseBulkText(text) {
@@ -2150,9 +2107,11 @@ function parseBulkText(text) {
     const parsedSubjects = [];
     let currentSub = null;
 
-    const codeRegex = /\b(\d{3}-\d{3})\b/;
+    // Matches standard subject codes: e.g., 308-493, CS211, CS-211, 01204111, ENG 101
+    const codeRegex = /\b(\d{3}-\d{3}|\d{5,8}|[A-Za-z]{2,4}[-\s]?\d{3,4})\b/;
     const timeRegex = /\b(\d{1,2})[:.](\d{2})\s*(?:น\.)?\s*[-–—]\s*(\d{1,2})[:.](\d{2})\s*(?:น\.)?\b/;
-    
+    const roomRegex = /\b(?:[a-zA-Z]{1,4}\d{3,4}(?:\([^)]+\))?|\d{3,4}|ห้อง\s*\d+|Lab\s*\d+|ONLINE|zoom|teams)\b/i;
+
     const dayMap = {
         'จันทร์': 'Monday', 'จ.': 'Monday', 'mon': 'Monday', 'monday': 'Monday',
         'อังคาร': 'Tuesday', 'อ.': 'Tuesday', 'tue': 'Tuesday', 'tuesday': 'Tuesday',
@@ -2162,6 +2121,16 @@ function parseBulkText(text) {
         'เสาร์': 'Saturday', 'ส.': 'Saturday', 'sat': 'Saturday', 'saturday': 'Saturday',
         'อาทิตย์': 'Sunday', 'อา.': 'Sunday', 'sun': 'Sunday', 'sunday': 'Sunday'
     };
+
+    function detectDay(str) {
+        const sortedKeys = Object.keys(dayMap).sort((a, b) => b.length - a.length);
+        for (const key of sortedKeys) {
+            if (str.toLowerCase().includes(key.toLowerCase())) {
+                return dayMap[key];
+            }
+        }
+        return null;
+    }
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -2173,21 +2142,12 @@ function parseBulkText(text) {
             }
 
             const code = codeMatch[1];
-            let name = line.replace(codeRegex, '').trim();
-            
-            if (i + 1 < lines.length && !lines[i + 1].match(codeRegex)) {
-                if (lines[i + 1].includes('วัน/เวลาเรียน') || lines[i + 1].includes('ห้องเรียน') || lines[i + 1].includes('ผู้สอน')) {
-                    // skip
-                } else {
-                    name += ' ' + lines[i + 1];
-                    i++;
-                }
-            }
+            let restOfLine = line.replace(codeRegex, '').trim();
 
             currentSub = {
                 id: 'sub_bulk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
                 subjectCode: code,
-                subjectName: name.replace(/\s+/g, ' ').trim(),
+                subjectName: '',
                 teacher: '',
                 day: 'Monday',
                 startTime: '09:00',
@@ -2195,26 +2155,69 @@ function parseBulkText(text) {
                 room: 'ไม่ระบุห้องเรียน',
                 color: ['indigo', 'emerald', 'coral', 'amethyst', 'amber'][parsedSubjects.length % 5]
             };
-        } else if (currentSub) {
-            let foundDay = null;
-            for (const key in dayMap) {
-                const regex = new RegExp('(?:^|\\s|\\b)' + key + '(?:$|\\s|\\b)', 'i');
-                if (line.match(regex)) {
-                    foundDay = dayMap[key];
-                    break;
+
+            const dayOnLine = detectDay(restOfLine);
+            const timeOnLine = restOfLine.match(timeRegex);
+
+            if (dayOnLine && timeOnLine) {
+                currentSub.day = dayOnLine;
+                currentSub.startTime = `${String(timeOnLine[1]).padStart(2, '0')}:${timeOnLine[2]}`;
+                currentSub.endTime = `${String(timeOnLine[3]).padStart(2, '0')}:${timeOnLine[4]}`;
+
+                // Extract name (everything before the day key)
+                let dayKeyMatched = '';
+                const sortedKeys = Object.keys(dayMap).sort((a, b) => b.length - a.length);
+                for (const key of sortedKeys) {
+                    if (restOfLine.toLowerCase().includes(key.toLowerCase())) {
+                        dayKeyMatched = key;
+                        break;
+                    }
+                }
+
+                const dayIndex = restOfLine.toLowerCase().indexOf(dayKeyMatched.toLowerCase());
+                const timeIndex = restOfLine.indexOf(timeOnLine[0]);
+                const cutIndex = Math.min(dayIndex !== -1 ? dayIndex : restOfLine.length, timeIndex !== -1 ? timeIndex : restOfLine.length);
+                
+                currentSub.subjectName = restOfLine.substring(0, cutIndex).trim();
+
+                const afterTime = restOfLine.substring(timeIndex + timeOnLine[0].length).trim();
+                const roomMatch = afterTime.match(roomRegex);
+                if (roomMatch) {
+                    currentSub.room = roomMatch[0];
+                    currentSub.teacher = afterTime.replace(roomRegex, '').replace(/,/g, ', ').replace(/\s+/g, ' ').trim();
+                } else {
+                    currentSub.teacher = afterTime.replace(/,/g, ', ').replace(/\s+/g, ' ').trim();
+                }
+            } else {
+                currentSub.subjectName = restOfLine;
+                // Peek at next line: if it doesn't match codeRegex, it could be name continuation
+                if (i + 1 < lines.length && !lines[i + 1].match(codeRegex)) {
+                    const nextLine = lines[i + 1];
+                    const dayOnNext = detectDay(nextLine);
+                    const timeOnNext = nextLine.match(timeRegex);
+
+                    if (!dayOnNext && !timeOnNext && !nextLine.includes('วัน/เวลาเรียน') && !nextLine.includes('ห้องเรียน') && !nextLine.includes('ผู้สอน')) {
+                        currentSub.subjectName += ' ' + nextLine;
+                        i++;
+                    }
                 }
             }
 
+            currentSub.subjectName = currentSub.subjectName.replace(/\s+/g, ' ').trim();
+            if (!currentSub.subjectName) {
+                currentSub.subjectName = 'วิชาเรียนแบบด่วน';
+            }
+        } else if (currentSub) {
+            const foundDay = detectDay(line);
             const timeMatch = line.match(timeRegex);
+
             if (foundDay && timeMatch) {
                 currentSub.day = foundDay;
                 currentSub.startTime = `${String(timeMatch[1]).padStart(2, '0')}:${timeMatch[2]}`;
                 currentSub.endTime = `${String(timeMatch[3]).padStart(2, '0')}:${timeMatch[4]}`;
 
-                let afterTime = line.substring(line.indexOf(timeMatch[0]) + timeMatch[0].length).trim();
-                const roomRegex = /\b(?:[a-zA-Z]{1,4}\d{3,4}(?:\([^)]+\))?|\d{3,4}|ห้อง\s*\d+|Lab\s*\d+|ONLINE|zoom|teams)\b/i;
+                const afterTime = line.substring(line.indexOf(timeMatch[0]) + timeMatch[0].length).trim();
                 const roomMatch = afterTime.match(roomRegex);
-                
                 if (roomMatch) {
                     currentSub.room = roomMatch[0];
                     currentSub.teacher = afterTime.replace(roomRegex, '').replace(/,/g, ', ').replace(/\s+/g, ' ').trim();
@@ -2226,6 +2229,13 @@ function parseBulkText(text) {
                     const cleanText = line.replace(/[-]/g, '').trim();
                     if (cleanText.length > 0) {
                         currentSub.teacher = cleanText;
+                    }
+                } else {
+                    const roomMatch = line.match(roomRegex);
+                    if (roomMatch) {
+                        currentSub.room = roomMatch[0];
+                    } else if (line.length > 0 && !currentSub.teacher) {
+                        currentSub.teacher = line;
                     }
                 }
             }
@@ -2400,5 +2410,22 @@ function checkClassNotifications() {
         }
     });
 }
+
+function setQuickDuration(hours) {
+    const startInput = document.getElementById('subject-start');
+    const endInput = document.getElementById('subject-end');
+    if (!startInput || !endInput || !startInput.value) return;
+
+    const [h, m] = startInput.value.split(':').map(Number);
+    const totalMinutes = Math.round(hours * 60);
+    const startMinutes = h * 60 + m;
+    const endMinutes = Math.min(END_HOUR * 60, startMinutes + totalMinutes);
+
+    const endH = Math.floor(endMinutes / 60);
+    const endM = endMinutes % 60;
+
+    endInput.value = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+}
+window.setQuickDuration = setQuickDuration;
 
 

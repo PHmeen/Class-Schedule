@@ -312,6 +312,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label style="font-size: 0.8rem; opacity: 0.8;">ปรับเวลาสิ้นสุดด่วน (ระยะเวลาเรียน)</label>
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickDuration(1)" style="flex: 1; padding: 6px 0; font-size: 0.78rem;">1 ชม.</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickDuration(1.5)" style="flex: 1; padding: 6px 0; font-size: 0.78rem;">1.5 ชม.</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickDuration(2)" style="flex: 1; padding: 6px 0; font-size: 0.78rem;">2 ชม.</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setQuickDuration(3)" style="flex: 1; padding: 6px 0; font-size: 0.78rem;">3 ชม.</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label for="subject-room">สถานที่เรียน / ลิงก์ห้องเรียน</label>
                         <input type="text" id="subject-room" placeholder="เช่น ห้อง 405 หรือ ลิงก์ MS Teams">
                     </div>
@@ -364,7 +374,10 @@
                         <code>324-381 SEMINAR IN CHEMISTRY พฤหัส 13:00-15:50 CH202</code>
                     </p>
                     <div class="form-group">
-                        <label for="bulk-input-text">วางข้อความตารางเรียน:</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label for="bulk-input-text">วางข้อความตารางเรียน:</label>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-insert-sample-bulk" style="padding: 4px 8px; font-size: 0.72rem; height: auto;">💡 ลองใส่ข้อความตัวอย่าง</button>
+                        </div>
                         <textarea id="bulk-input-text" rows="8" placeholder="วางข้อความตารางเรียนที่นี่..." style="width: 100%; padding: 12px; border-radius: var(--border-radius-md); border: 1px solid #cbd5e1; font-family: inherit; font-size: 0.9rem; resize: vertical; outline: none; background-color: #f8fafc; transition: var(--transition-smooth);"></textarea>
                     </div>
                     
