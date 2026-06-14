@@ -2312,15 +2312,272 @@ body.font-mitr, body.font-mitr * { font-family: 'Outfit', 'Mitr', sans-serif !im
 
 
 
-/* Custom Background Image Support Styles */
-body.has-custom-bg .aurora-bg {
-    background-image: var(--custom-bg-url) !important;
-    background-size: cover !important;
-    background-position: center !important;
+/* Theme Selector UI in Drawer */
+.theme-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 6px;
 }
 
-body.has-custom-bg .aurora-blob {
-    display: none !important; /* Hide blobs so we see the custom background image clearly */
+.theme-btn {
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: var(--border-radius-md);
+    padding: 10px 4px;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: var(--transition-smooth);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.theme-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.theme-btn.active {
+    box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--primary);
+}
+
+/* ==========================================================================
+   TIMETABLE THEME PRESETS
+   ========================================================================== */
+
+/* 1. Macaron Theme (พาสเทลสายรุ้งอ่อน) */
+body.theme-macaron .timetable-capture-area {
+    background-image: linear-gradient(135deg, #ffd3d3 0%, #dcf0ff 50%, #eae0fa 100%) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+}
+body.theme-macaron .timetable-wrapper {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-macaron .grid-header-cell,
+body.theme-macaron .time-axis-cell {
+    background: rgba(255, 255, 255, 0.4) !important;
+    color: #312e81 !important;
+}
+
+/* 2. Retro Theme (โตเกียวเรโทร วินเทจอบอุ่น) */
+body.theme-retro .timetable-capture-area {
+    background-image: linear-gradient(135deg, #fdfbf7 0%, #f3dfc8 70%, #d8c29d 100%) !important;
+    border-color: rgba(139, 92, 26, 0.15) !important;
+}
+body.theme-retro .timetable-wrapper {
+    background: rgba(255, 253, 249, 0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-color: rgba(139, 92, 26, 0.1) !important;
+}
+body.theme-retro .grid-header-cell,
+body.theme-retro .time-axis-cell {
+    background: rgba(245, 230, 211, 0.7) !important;
+    color: #431407 !important;
+    border-color: rgba(139, 92, 26, 0.1) !important;
+}
+body.theme-retro .grid-cell {
+    border-right: 1px dashed rgba(139, 92, 26, 0.12) !important;
+    border-bottom: 1px solid rgba(139, 92, 26, 0.08) !important;
+}
+body.theme-retro .grid-cell.hour-line {
+    border-right: 1px solid rgba(139, 92, 26, 0.2) !important;
+}
+
+/* 3. Matcha Theme (มัทฉะกรีน ผ่อนคลายสบายตา) */
+body.theme-matcha .timetable-capture-area {
+    background-image: linear-gradient(135deg, #f0f4f1 0%, #d7e4db 50%, #afcbb9 100%) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+body.theme-matcha .timetable-wrapper {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(12px) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+body.theme-matcha .grid-header-cell,
+body.theme-matcha .time-axis-cell {
+    background: rgba(226, 235, 226, 0.65) !important;
+    color: #022c22 !important;
+    border-color: rgba(2, 44, 34, 0.08) !important;
+}
+body.theme-matcha .grid-cell {
+    border-right: 1px dashed rgba(2, 44, 34, 0.08) !important;
+    border-bottom: 1px solid rgba(2, 44, 34, 0.05) !important;
+}
+body.theme-matcha .grid-cell.hour-line {
+    border-right: 1px solid rgba(2, 44, 34, 0.15) !important;
+}
+
+/* 4. Nordic Theme (นอร์ดิก มินิมอล สะอาดตา) */
+body.theme-nordic .timetable-capture-area {
+    background-image: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 60%, #bcccdc 100%) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+body.theme-nordic .timetable-wrapper {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-nordic .grid-header-cell,
+body.theme-nordic .time-axis-cell {
+    background: rgba(217, 226, 236, 0.5) !important;
+    color: #0f172a !important;
+}
+
+/* 5. Amber Theme (ทองอำพัน เติมพลังสร้างสรรค์) */
+body.theme-amber .timetable-capture-area {
+    background-image: linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fde68a 100%) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+}
+body.theme-amber .timetable-wrapper {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(12px) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-amber .grid-header-cell,
+body.theme-amber .time-axis-cell {
+    background: rgba(254, 243, 199, 0.6) !important;
+    color: #451a03 !important;
+}
+
+/* 6. Dark Theme (ดาร์กโหมด ถนอมสายตากลางคืน) */
+body.theme-dark .timetable-capture-area {
+    background-image: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.theme-dark .timetable-wrapper {
+    background: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.theme-dark .grid-header-cell,
+body.theme-dark .time-axis-cell {
+    background: rgba(30, 41, 59, 0.85) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.theme-dark .grid-cell {
+    border-right: 1px dashed rgba(255, 255, 255, 0.08) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+body.theme-dark .grid-cell.hour-line {
+    border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 7. Cyber Theme (ไซเบอร์นีออน ล้ำยุคเรืองแสง) */
+body.theme-cyber .timetable-capture-area {
+    background-image: linear-gradient(135deg, #090d16 0%, #15102a 60%, #440b3c 100%) !important;
+    border-color: rgba(219, 39, 119, 0.4) !important;
+}
+body.theme-cyber .timetable-wrapper {
+    background: rgba(9, 13, 22, 0.75) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(219, 39, 119, 0.3) !important;
+    box-shadow: 0 0 20px rgba(219, 39, 119, 0.15) !important;
+}
+body.theme-cyber .grid-header-cell,
+body.theme-cyber .time-axis-cell {
+    background: rgba(21, 16, 42, 0.85) !important;
+    color: #f8fafc !important;
+    border-color: rgba(219, 39, 119, 0.2) !important;
+}
+body.theme-cyber .grid-cell {
+    border-right: 1px dashed rgba(0, 242, 254, 0.12) !important;
+    border-bottom: 1px solid rgba(219, 39, 119, 0.1) !important;
+}
+body.theme-cyber .grid-cell.hour-line {
+    border-right: 1px solid rgba(0, 242, 254, 0.25) !important;
+}
+
+/* 8. Ocean Theme (คลื่นสมุทร ปลอดโปร่ง) */
+body.theme-ocean .timetable-capture-area {
+    background-image: linear-gradient(135deg, #073b4c 0%, #118ab2 60%, #06d6a0 100%) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+body.theme-ocean .timetable-wrapper {
+    background: rgba(10, 34, 42, 0.7) !important;
+    backdrop-filter: blur(14px) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+body.theme-ocean .grid-header-cell,
+body.theme-ocean .time-axis-cell {
+    background: rgba(7, 59, 76, 0.85) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+body.theme-ocean .grid-cell {
+    border-right: 1px dashed rgba(255, 255, 255, 0.08) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+body.theme-ocean .grid-cell.hour-line {
+    border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 9. Candy Theme (คอตตอนแคนดี้ พาสเทลแฟนตาซี) */
+body.theme-candy .timetable-capture-area {
+    background-image: linear-gradient(135deg, #ff9a9e 0%, #fecfef 40%, #a1c4fd 100%) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+}
+body.theme-candy .timetable-wrapper {
+    background: rgba(255, 255, 255, 0.68) !important;
+    backdrop-filter: blur(12px) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-candy .grid-header-cell,
+body.theme-candy .time-axis-cell {
+    background: rgba(255, 255, 255, 0.45) !important;
+    color: #4b0082 !important;
+}
+
+/* 10. Espresso Theme (เอสเพรสโซ่เข้ม อุ่นใจคนชอบกาแฟ) */
+body.theme-espresso .timetable-capture-area {
+    background-image: linear-gradient(135deg, #2b1d12 0%, #180f0a 100%) !important;
+    border-color: rgba(139, 92, 26, 0.2) !important;
+}
+body.theme-espresso .timetable-wrapper {
+    background: rgba(28, 17, 10, 0.75) !important;
+    backdrop-filter: blur(14px) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+body.theme-espresso .grid-header-cell,
+body.theme-espresso .time-axis-cell {
+    background: rgba(54, 38, 25, 0.85) !important;
+    color: #f5e6d3 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+body.theme-espresso .grid-cell {
+    border-right: 1px dashed rgba(255, 255, 255, 0.06) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+body.theme-espresso .grid-cell.hour-line {
+    border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 11. Sakura Theme (ซากุระสว่าง ละมุนใจ) */
+body.theme-sakura .timetable-capture-area {
+    background-image: linear-gradient(135deg, #fff5f5 0%, #fed7d7 50%, #fbb6ce 100%) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+}
+body.theme-sakura .timetable-wrapper {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+body.theme-sakura .grid-header-cell,
+body.theme-sakura .time-axis-cell {
+    background: rgba(255, 245, 245, 0.6) !important;
+    color: #702444 !important;
+}
+
+/* Make cards pop on custom theme backgrounds */
+body:not(.theme-glass) .subject-card {
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08), inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
+    border-width: 1.5px !important;
 }
 
 /* ==========================================================================

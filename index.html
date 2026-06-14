@@ -417,31 +417,25 @@
                     </select>
                 </div>
 
-                <!-- 3. ความเร็วพื้นหลัง Aurora -->
-                <div class="customize-section" id="aurora-speed-control">
-                    <h3>ความเร็วเคลื่อนไหว Aurora (วินาที)</h3>
-                    <div class="slider-wrapper">
-                        <input type="range" id="aurora-speed-slider" min="0" max="60" value="30" step="5">
-                        <span id="aurora-speed-val">30s</span>
-                    </div>
-                    <p class="section-desc">ปรับเป็น 0 เพื่อให้พื้นหลังออโรร่าหยุดนิ่ง ช่วยประหยัดแบตเตอรี่</p>
-                </div>
 
-                <!-- 4. พื้นหลังรูปภาพส่วนตัว -->
+
+                <!-- 4. เลือกธีมพื้นหลังตารางเรียน -->
                 <div class="customize-section">
-                    <h3>อัปโหลดภาพพื้นหลังส่วนตัว</h3>
-                    <div class="bg-upload-wrapper">
-                        <button type="button" id="btn-upload-bg-trigger" class="btn btn-secondary btn-sm"
-                            style="width: 100%; margin-bottom: 8px;">
-                            📁 เลือกรูปภาพจากเครื่อง
-                        </button>
-                        <input type="file" id="bg-image-upload" accept="image/*" style="display: none;">
-                        <button type="button" id="btn-reset-bg" class="btn-sm-danger"
-                            style="width: 100%; border-radius: 6px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: none;">
-                            🗑️ ลบพื้นหลังส่วนตัว
-                        </button>
+                    <h3>ธีมตารางเรียน (Timetable Theme)</h3>
+                    <div class="theme-selector-grid">
+                        <button type="button" class="theme-btn active" data-theme="theme-glass" style="background: rgba(255,255,255,0.75); color: #0f172a; border: 1px solid rgba(15,23,42,0.15);" title="กระจกฝ้าดั้งเดิม">🔮 คลาสสิก</button>
+                        <button type="button" class="theme-btn" data-theme="theme-macaron" style="background: linear-gradient(135deg, #ffd3d3, #dcf0ff, #eae0fa); color: #1e1b4b;" title="มาการองพาสเทล">🌸 พาสเทล</button>
+                        <button type="button" class="theme-btn" data-theme="theme-retro" style="background: linear-gradient(135deg, #fdfbf7, #f3dfc8, #d8c29d); color: #431407;" title="โตเกียวเรโทร">🍂 เรโทร</button>
+                        <button type="button" class="theme-btn" data-theme="theme-matcha" style="background: linear-gradient(135deg, #f0f4f1, #d7e4db, #afcbb9); color: #022c22;" title="มัทฉะกรีน">🍵 มัทฉะ</button>
+                        <button type="button" class="theme-btn" data-theme="theme-nordic" style="background: linear-gradient(135deg, #f0f4f8, #d9e2ec, #bcccdc); color: #0f172a;" title="นอร์ดิกบรีซ">❄️ นอร์ดิก</button>
+                        <button type="button" class="theme-btn" data-theme="theme-amber" style="background: linear-gradient(135deg, #fffbeb, #fef3c7, #fde68a); color: #451a03;" title="ทองอำพัน">🍯 อำพัน</button>
+                        <button type="button" class="theme-btn" data-theme="theme-dark" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white;" title="ดาร์กสตาดี้">🌑 ดาร์ก</button>
+                        <button type="button" class="theme-btn" data-theme="theme-cyber" style="background: linear-gradient(135deg, #090d16, #15102a, #440b3c); color: white;" title="ไซเบอร์นีออน">🛸 นีออน</button>
+                        <button type="button" class="theme-btn" data-theme="theme-ocean" style="background: linear-gradient(135deg, #073b4c, #118ab2, #06d6a0); color: white;" title="คลื่นมหาสมุทร">🌊 โอเชี่ยน</button>
+                        <button type="button" class="theme-btn" data-theme="theme-candy" style="background: linear-gradient(135deg, #ff9a9e, #fecfef, #a1c4fd); color: #1e1b4b;" title="สายไหมแคนดี้">🦄 แคนดี้</button>
+                        <button type="button" class="theme-btn" data-theme="theme-espresso" style="background: linear-gradient(135deg, #2b1d12, #180f0a); color: white;" title="กาแฟเข้มข้น">☕ เอสเพรสโซ่</button>
+                        <button type="button" class="theme-btn" data-theme="theme-sakura" style="background: linear-gradient(135deg, #fff5f5, #fed7d7, #fbb6ce); color: #702444;" title="ซากุระผลิบาน">💮 ซากุระ</button>
                     </div>
-                    <p class="section-desc">รูปภาพจะถูกนำไปเบลอเป็นฉากหลังกระจกฝ้าอย่างหรูหรา</p>
                 </div>
 
                 <!-- 5. ระบบแจ้งเตือนเวลาเรียน -->

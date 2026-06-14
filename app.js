@@ -53,15 +53,20 @@ function applySavedFont() {
     document.body.classList.add(currentFont);
 }
 
-// ฟังก์ชันใช้พื้นหลังรูปภาพส่วนตัวที่บันทึกไว้
-function applySavedBackground() {
-    const savedBg = localStorage.getItem('my_custom_bg_base64');
-    if (savedBg) {
-        document.body.style.setProperty('--custom-bg-url', `url(${savedBg})`);
-        document.body.classList.add('has-custom-bg');
-        const btnReset = document.getElementById('btn-reset-bg');
-        if (btnReset) btnReset.style.display = 'block';
-    }
+// ฟังก์ชันใช้ธีมตารางเรียนที่บันทึกไว้
+function applySavedTheme() {
+    const activeTheme = localStorage.getItem('my_timetable_theme') || 'theme-glass';
+    document.body.classList.remove(
+        'theme-glass', 'theme-macaron', 'theme-retro', 'theme-matcha', 
+        'theme-nordic', 'theme-amber', 'theme-dark', 'theme-cyber',
+        'theme-ocean', 'theme-candy', 'theme-espresso', 'theme-sakura'
+    );
+    document.body.classList.add(activeTheme);
+
+    // Sync UI active state
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-theme') === activeTheme);
+    });
 }
 
 function initApp() {
@@ -69,8 +74,8 @@ function initApp() {
     updateClock();
     setInterval(updateClock, 1000);
 
-    // โหลดพื้นหลังและฟอนต์ที่บันทึกไว้ (รองรับการแสดงผลบน Widget)
-    try { applySavedBackground(); } catch (e) { console.error('applySavedBackground error:', e); }
+    // โหลดพื้นหลังและฟอนต์ที่บันทึกไว้
+    try { applySavedTheme(); } catch (e) { console.error('applySavedTheme error:', e); }
     try { applySavedFont(); } catch (e) { console.error('applySavedFont error:', e); }
 
     // ห่อแต่ละฟังก์ชัน setup ด้วย try-catch เพื่อให้ render() ถูกเรียกเสมอ
@@ -1893,84 +1898,18 @@ function initCustomizer() {
         });
     }
 
-    // 4. Aurora Speed Slider
-    const speedSlider = document.getElementById('aurora-speed-slider');
-    const speedVal = document.getElementById('aurora-speed-val');
-    const initialSpeed = localStorage.getItem('my_aurora_speed') || '30';
 
-    if (speedSlider && speedVal) {
-        speedSlider.value = initialSpeed;
-        speedVal.innerText = initialSpeed === '0' ? 'Static' : initialSpeed + 's';
-        
-        speedSlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            speedVal.innerText = val === '0' ? 'Static' : val + 's';
-            applyAuroraSpeed(val);
+
+    // 5. Timetable Theme Selection
+    applySavedTheme();
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const theme = e.currentTarget.getAttribute('data-theme');
+            localStorage.setItem('my_timetable_theme', theme);
+            applySavedTheme();
+            showToast('🎨 เปลี่ยนธีมพื้นหลังตารางเรียนแล้ว');
         });
-    }
-
-    function applyAuroraSpeed(speedSec) {
-        const blobs = document.querySelectorAll('.aurora-blob');
-        blobs.forEach((blob, index) => {
-            if (speedSec === '0') {
-                blob.style.animation = 'none';
-            } else {
-                // Keep original base speeds but scale them based on user preference
-                let factor = 1.0;
-                if (index === 0) factor = 25 / 30;
-                else if (index === 1) factor = 30 / 30;
-                else if (index === 2) factor = 28 / 30;
-                
-                const calculatedSpeed = Math.round(Number(speedSec) * factor);
-                blob.style.animation = `drift-${index + 1} ${calculatedSpeed}s infinite alternate ease-in-out`;
-            }
-        });
-        localStorage.setItem('my_aurora_speed', speedSec);
-    }
-    
-    applyAuroraSpeed(initialSpeed);
-
-    // 5. Custom Background Image Upload
-    const btnUploadTrigger = document.getElementById('btn-upload-bg-trigger');
-    const fileInput = document.getElementById('bg-image-upload');
-    const btnReset = document.getElementById('btn-reset-bg');
-
-    if (btnUploadTrigger && fileInput) {
-        btnUploadTrigger.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Check size (keep Base64 under ~4MB to avoid localStorage limits)
-            if (file.size > 4 * 1024 * 1024) {
-                showToast('⚠️ ขนาดรูปภาพใหญ่เกินไป (กรุณาเลือกรูปขนาดไม่เกิน 4MB)');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const base64 = event.target.result;
-                localStorage.setItem('my_custom_bg_base64', base64);
-                applySavedBackground();
-                showToast('🖼️ อัปโหลดและติดตั้งภาพพื้นหลังใหม่แล้ว');
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    if (btnReset) {
-        btnReset.addEventListener('click', () => {
-            document.body.style.removeProperty('--custom-bg-url');
-            document.body.classList.remove('has-custom-bg');
-            btnReset.style.display = 'none';
-            localStorage.removeItem('my_custom_bg_base64');
-            showToast('🗑️ รีเซ็ตภาพพื้นหลังเป็นออริจินัลแล้ว');
-        });
-
-        if (localStorage.getItem('my_custom_bg_base64')) {
-            btnReset.style.display = 'block';
-        }
-    }
+    });
 }
 
 function setupOnlineStatusMonitor() {
