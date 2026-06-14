@@ -51,11 +51,14 @@ function initApp() {
     updateClock();
     setInterval(updateClock, 1000);
 
-    setupEventListeners();
-    initCustomizer();
-    setupOnlineStatusMonitor();
-    setupBulkAdd();
-    render();
+    // ห่อแต่ละฟังก์ชัน setup ด้วย try-catch เพื่อให้ render() ถูกเรียกเสมอ
+    // แม้ว่าจะเกิด error ในขั้นตอน setup ใดขั้นตอนหนึ่ง
+    try { setupEventListeners(); } catch (e) { console.error('setupEventListeners error:', e); }
+    try { initCustomizer(); } catch (e) { console.error('initCustomizer error:', e); }
+    try { setupOnlineStatusMonitor(); } catch (e) { console.error('setupOnlineStatusMonitor error:', e); }
+    try { setupBulkAdd(); } catch (e) { console.error('setupBulkAdd error:', e); }
+
+    render(); // เรียก render() เสมอ ไม่ว่า setup จะสำเร็จหรือไม่
 }
 
 
@@ -178,6 +181,7 @@ function loadSchedules() {
         };
         schedules.push(term1_2569Schedule);
         activeScheduleId = term1_2569Schedule.id;
+        saveSchedules(); // บันทึกเพื่อป้องกัน push ซ้ำเมื่อรีเฟรช
     }
 
     // เพิ่มและอัปเดตตารางเรียนของ ส้มจี๊ด 🍊
@@ -257,6 +261,12 @@ function updateScheduleDropdown() {
 // RENDER & TIMETABLE GRID GENERATION
 // ==========================================================================
 function render() {
+    const activeSch = getActiveSchedule();
+    const displayNameEl = document.getElementById('display-schedule-name');
+    if (displayNameEl && activeSch) {
+        displayNameEl.innerText = activeSch.name;
+    }
+
     if (currentView === 'weekly') {
         renderWeeklyGrid();
     } else {
@@ -271,6 +281,12 @@ function switchView(view) {
     document.getElementById('toggle-today').classList.toggle('active', view === 'today');
     document.getElementById('view-weekly-container').classList.toggle('active', view === 'weekly');
     document.getElementById('view-today-container').classList.toggle('active', view === 'today');
+    
+    // ซิงค์ปุ่มบน Mobile Quick Bar
+    const mqbWeekly = document.getElementById('mqb-toggle-weekly');
+    const mqbToday = document.getElementById('mqb-toggle-today');
+    if (mqbWeekly) mqbWeekly.classList.toggle('active', view === 'weekly');
+    if (mqbToday) mqbToday.classList.toggle('active', view === 'today');
     
     const mobileSelector = document.getElementById('mobile-day-tabs');
     if (mobileSelector) {
@@ -1480,45 +1496,56 @@ function setupEventListeners() {
     document.getElementById('btn-rename-schedule').addEventListener('click', renameSchedule);
     document.getElementById('btn-delete-schedule').addEventListener('click', deleteSchedule);
     
+    // คลิกที่หัวข้อชื่อตารางเรียนหรือปุ่มแก้ไขเพื่อเปลี่ยนชื่อทันที
+    const displayNameEl = document.getElementById('display-schedule-name');
+    const btnQuickRename = document.getElementById('btn-quick-rename');
+    if (displayNameEl) displayNameEl.addEventListener('click', renameSchedule);
+    if (btnQuickRename) btnQuickRename.addEventListener('click', renameSchedule);
+    
     // ปุ่มสลับแนวตั้ง/แนวนอน
     document.getElementById('btn-toggle-orientation').addEventListener('click', toggleGridOrientation);
 
     // ปุ่มเปิดปิดเมนู Hamburger สำหรับอุปกรณ์ขนาดเล็ก
     const btnMenuToggle = document.getElementById('btn-menu-toggle');
     const headerControls = document.querySelector('.header-controls');
-    const navBackdrop = document.getElementById('nav-backdrop');
 
-    if (btnMenuToggle && headerControls && navBackdrop) {
+    if (btnMenuToggle && headerControls) {
+        const closeMenuPanel = () => {
+            headerControls.classList.remove('show-menu');
+            btnMenuToggle.classList.remove('active');
+        };
+
         btnMenuToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             headerControls.classList.toggle('show-menu');
-            navBackdrop.classList.toggle('show');
             btnMenuToggle.classList.toggle('active');
         });
 
-        // ปิดเมนูเมื่อคลิกที่พื้นหลัง (Backdrop)
-        navBackdrop.addEventListener('click', () => {
-            headerControls.classList.remove('show-menu');
-            navBackdrop.classList.remove('show');
-            btnMenuToggle.classList.remove('active');
-        });
-
-        // ปิดเมนูเมื่อคลิกปุ่มต่างๆ ในแถบควบคุม
-        headerControls.querySelectorAll('button, select, input').forEach(el => {
-            el.addEventListener('click', (e) => {
-                if (e.target.id === 'schedule-select') return;
-                headerControls.classList.remove('show-menu');
-                navBackdrop.classList.remove('show');
-                btnMenuToggle.classList.remove('active');
-            });
-        });
-
         // ปิดเมนูเมื่อเปลี่ยนตารางเรียน
-        document.getElementById('schedule-select').addEventListener('change', () => {
-            headerControls.classList.remove('show-menu');
-            navBackdrop.classList.remove('show');
-            btnMenuToggle.classList.remove('active');
+        document.getElementById('schedule-select').addEventListener('change', closeMenuPanel);
+        
+        // ปิดเมนูเมื่อคลิกข้างนอก (body)
+        document.addEventListener('click', (e) => {
+            if (!headerControls.contains(e.target) && !btnMenuToggle.contains(e.target)) {
+                closeMenuPanel();
+            }
         });
+    }
+
+    // === Mobile Quick Bar buttons ===
+    const btnAddSubjectQuick = document.getElementById('btn-add-subject-quick');
+    if (btnAddSubjectQuick) {
+        btnAddSubjectQuick.addEventListener('click', openAddModal);
+    }
+
+    const mqbOrientation = document.getElementById('mqb-toggle-orientation');
+    if (mqbOrientation) {
+        mqbOrientation.addEventListener('click', toggleGridOrientation);
+    }
+
+    const mqbCustomizer = document.getElementById('mqb-open-customizer');
+    if (mqbCustomizer) {
+        mqbCustomizer.addEventListener('click', openCustomizer);
     }
 
     // เปิดใช้งานการคลิกลากเพื่อขยับเลื่อนตาราง (Drag-to-Scroll)
@@ -1771,7 +1798,9 @@ function initCustomizer() {
     btnOpen.addEventListener('click', () => drawer.classList.add('open'));
     btnClose.addEventListener('click', () => drawer.classList.remove('open'));
 
-    // Close when clicking outside of drawer content
+    // เปิด Customizer Drawer จากภายนอก (เช่น จาก Mobile Quick Bar)
+    window.openCustomizer = () => drawer.classList.add('open');
+
     window.addEventListener('click', (e) => {
         if (drawer.classList.contains('open') && 
             !drawer.contains(e.target) && 

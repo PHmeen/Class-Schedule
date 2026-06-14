@@ -11,7 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Chonburi&family=Mitr:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.5">
+    <link rel="stylesheet" href="style.css?v=3.3">
     <!-- PWA & iOS Safari Support -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.svg">
@@ -96,20 +96,23 @@
         }
 
         .app-main {
-            flex-grow: 1;
-            overflow: hidden;
+            flex: 1;
+            min-height: 0; /* fix flex overflow */
             display: flex;
             flex-direction: column;
+            overflow: visible;
         }
 
         .view-content.active {
-            height: 100%;
+            flex: 1;
+            min-height: 0;
             display: flex;
             flex-direction: column;
         }
 
         .timetable-capture-area {
-            height: 100%;
+            flex: 1;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             padding: 0 !important;
@@ -119,7 +122,9 @@
         }
 
         .timetable-wrapper {
-            flex-grow: 1;
+            flex: 1;
+            min-height: 200px; /* ป้องกันตารางยุบใน Widget */
+            max-height: none !important; /* ยกเลิก max-height จาก main CSS */
             overflow: auto !important;
             border-radius: var(--border-radius-md);
             border: 1px solid rgba(226, 232, 240, 0.8);
@@ -465,7 +470,7 @@
             }
         })();
     </script>
-    <script src="app.js?v=1.5"></script>
+    <script src="app.js?v=3.1"></script>
     <script>
         // ฟังก์ชันอัปเดตชื่อตารางเรียนในหัว Widget จาก localStorage
         function updateWidgetHeader() {
