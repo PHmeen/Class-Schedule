@@ -1,10 +1,10 @@
-const CACHE_NAME = 'timetable-cache-v4.1';
+const CACHE_NAME = 'timetable-cache-v4.2';
 const ASSETS = [
   './',
   './index.html',
   './widget.html',
-  './style.css?v=4.1',
-  './app.js?v=4.1',
+  './style.css?v=4.2',
+  './app.js?v=4.2',
   './manifest.json',
   './logo.svg'
 ];

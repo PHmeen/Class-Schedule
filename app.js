@@ -46,10 +46,32 @@ document.addEventListener('DOMContentLoaded', () => {
     initApp();
 });
 
+// ฟังก์ชันใช้ฟอนต์ที่บันทึกไว้
+function applySavedFont() {
+    const currentFont = localStorage.getItem('my_custom_font') || 'font-kanit';
+    document.body.classList.remove('font-kanit', 'font-sarabun', 'font-chonburi', 'font-mitr');
+    document.body.classList.add(currentFont);
+}
+
+// ฟังก์ชันใช้พื้นหลังรูปภาพส่วนตัวที่บันทึกไว้
+function applySavedBackground() {
+    const savedBg = localStorage.getItem('my_custom_bg_base64');
+    if (savedBg) {
+        document.body.style.setProperty('--custom-bg-url', `url(${savedBg})`);
+        document.body.classList.add('has-custom-bg');
+        const btnReset = document.getElementById('btn-reset-bg');
+        if (btnReset) btnReset.style.display = 'block';
+    }
+}
+
 function initApp() {
     loadSchedules();
     updateClock();
     setInterval(updateClock, 1000);
+
+    // โหลดพื้นหลังและฟอนต์ที่บันทึกไว้ (รองรับการแสดงผลบน Widget)
+    try { applySavedBackground(); } catch (e) { console.error('applySavedBackground error:', e); }
+    try { applySavedFont(); } catch (e) { console.error('applySavedFont error:', e); }
 
     // ห่อแต่ละฟังก์ชัน setup ด้วย try-catch เพื่อให้ render() ถูกเรียกเสมอ
     // แม้ว่าจะเกิด error ในขั้นตอน setup ใดขั้นตอนหนึ่ง
@@ -1888,17 +1910,10 @@ function initCustomizer() {
     if (fontSelect) {
         fontSelect.value = currentFont;
         fontSelect.addEventListener('change', (e) => {
-            applyFont(e.target.value);
+            localStorage.setItem('my_custom_font', e.target.value);
+            applySavedFont();
         });
     }
-
-    function applyFont(fontClass) {
-        document.body.classList.remove('font-kanit', 'font-sarabun', 'font-chonburi', 'font-mitr');
-        document.body.classList.add(fontClass);
-        localStorage.setItem('my_custom_font', fontClass);
-    }
-    
-    applyFont(currentFont);
 
     // 4. Aurora Speed Slider
     const speedSlider = document.getElementById('aurora-speed-slider');
@@ -1941,7 +1956,6 @@ function initCustomizer() {
     const btnUploadTrigger = document.getElementById('btn-upload-bg-trigger');
     const fileInput = document.getElementById('bg-image-upload');
     const btnReset = document.getElementById('btn-reset-bg');
-    const savedBg = localStorage.getItem('my_custom_bg_base64');
 
     if (btnUploadTrigger && fileInput) {
         btnUploadTrigger.addEventListener('click', () => fileInput.click());
@@ -1958,7 +1972,8 @@ function initCustomizer() {
             const reader = new FileReader();
             reader.onload = function(event) {
                 const base64 = event.target.result;
-                applyCustomBg(base64);
+                localStorage.setItem('my_custom_bg_base64', base64);
+                applySavedBackground();
                 showToast('🖼️ อัปโหลดและติดตั้งภาพพื้นหลังใหม่แล้ว');
             };
             reader.readAsDataURL(file);
@@ -1973,18 +1988,10 @@ function initCustomizer() {
             localStorage.removeItem('my_custom_bg_base64');
             showToast('🗑️ รีเซ็ตภาพพื้นหลังเป็นออริจินัลแล้ว');
         });
-    }
 
-    function applyCustomBg(base64) {
-        if (!base64) return;
-        document.body.style.setProperty('--custom-bg-url', `url(${base64})`);
-        document.body.classList.add('has-custom-bg');
-        if (btnReset) btnReset.style.display = 'block';
-        localStorage.setItem('my_custom_bg_base64', base64);
-    }
-
-    if (savedBg) {
-        applyCustomBg(savedBg);
+        if (localStorage.getItem('my_custom_bg_base64')) {
+            btnReset.style.display = 'block';
+        }
     }
 }
 
