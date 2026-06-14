@@ -11,7 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Kanit:wght@200;300;400;500;600&family=Sarabun:wght@300;400;500;600;700&family=Chonburi&family=Mitr:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=3.9">
+    <link rel="stylesheet" href="style.css?v=4.1">
     <!-- PWA & iOS Safari Support -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.svg">
@@ -89,9 +89,9 @@
                     <svg viewBox="0 0 24 24"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
                     <span>สลับแนว</span>
                 </button>
-                <button id="mqb-open-customizer" class="mqb-btn" title="ตกแต่งตาราง">
+                <button id="mqb-open-customizer" class="mqb-btn" title="ตั้งค่าตารางเรียน">
                     <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.75-.39-1.04-.23-.29-.38-.67-.38-1.09 0-.83.67-1.5 1.5-1.5H16.2c2.28 0 4.12-1.84 4.12-4.12 0-4.97-4.03-9-9-9zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5S18.33 12 17.5 12z"/></svg>
-                    <span>ตกแต่ง</span>
+                    <span>ตั้งค่า</span>
                 </button>
             </div>
 
@@ -137,9 +137,9 @@
                 <div class="menu-section desktop-only-section">
                     <div class="menu-section-label">⚙️ ตั้งค่า</div>
                     <div class="menu-btn-row">
-                        <button id="btn-open-customizer" class="btn btn-secondary" title="ตกแต่งตารางเรียน ปรับธีม และฟอนต์">
+                        <button id="btn-open-customizer" class="btn btn-secondary" title="ตั้งค่าตารางเรียน ปรับธีม และฟอนต์">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.75-.39-1.04-.23-.29-.38-.67-.38-1.09 0-.83.67-1.5 1.5-1.5H16.2c2.28 0 4.12-1.84 4.12-4.12 0-4.97-4.03-9-9-9zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5S18.33 12 17.5 12z"/></svg>
-                            ตกแต่งตาราง
+                            ตั้งค่าตารางเรียน
                         </button>
                         <button id="btn-toggle-orientation" class="btn btn-secondary" title="สลับเลย์เอาต์แนวตั้ง / แนวนอน">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg>
@@ -388,7 +388,7 @@
         <!-- Drawer แผงปรับแต่งสไตล์ (Premium Visual Customizer) -->
         <div id="customizer-drawer" class="customizer-drawer">
             <div class="drawer-header">
-                <h2>🎨 ปรับแต่งตารางเรียน</h2>
+                <h2>⚙️ ตั้งค่าตารางเรียน</h2>
                 <button id="btn-close-customizer" class="close-drawer" aria-label="ปิดกล่อง">&times;</button>
             </div>
             <div class="drawer-body">
@@ -430,6 +430,28 @@
                     </div>
                     <p class="section-desc">รูปภาพจะถูกนำไปเบลอเป็นฉากหลังกระจกฝ้าอย่างหรูหรา</p>
                 </div>
+
+                <!-- 5. ระบบแจ้งเตือนเวลาเรียน -->
+                <div class="customize-section">
+                    <h3>🔔 ระบบแจ้งเตือนก่อนเข้าเรียน</h3>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,0.4); padding: 8px 12px; border-radius: var(--border-radius-md); border: 1px solid rgba(15,23,42,0.06);">
+                        <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">เปิดการแจ้งเตือน</span>
+                        <label class="switch-toggle" title="เปิด/ปิดการรับแจ้งเตือน">
+                            <input type="checkbox" id="notify-toggle">
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                    <div id="notify-settings-group" style="display: none; flex-direction: column; gap: 8px; margin-top: 6px;">
+                        <label for="notify-lead-time" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">เตือนล่วงหน้า (นาที)</label>
+                        <select id="notify-lead-time" class="customizer-select">
+                            <option value="5">5 นาที</option>
+                            <option value="10" selected>10 นาที</option>
+                            <option value="15">15 นาที</option>
+                            <option value="20">20 นาที</option>
+                        </select>
+                    </div>
+                    <p class="section-desc">เตือนบนคอมพิวเตอร์และมือถือเมื่อใกล้เริ่มเรียน (ต้องการสิทธิ์การแจ้งเตือนและเปิดหน้าเว็บนี้ค้างไว้)</p>
+                </div>
             </div>
         </div>
 
@@ -469,7 +491,7 @@
 
     <!-- Backdrop (ไม่ใช้งานแล้ว – ถูกแทนที่ด้วย inline collapsible menu) -->
 
-    <script src="app.js?v=3.9"></script>
+    <script src="app.js?v=4.1"></script>
 </body>
 
 </html>

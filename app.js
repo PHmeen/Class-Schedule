@@ -57,6 +57,7 @@ function initApp() {
     try { initCustomizer(); } catch (e) { console.error('initCustomizer error:', e); }
     try { setupOnlineStatusMonitor(); } catch (e) { console.error('setupOnlineStatusMonitor error:', e); }
     try { setupBulkAdd(); } catch (e) { console.error('setupBulkAdd error:', e); }
+    try { initNotifications(); } catch (e) { console.error('initNotifications error:', e); }
 
     render(); // เรียก render() เสมอ ไม่ว่า setup จะสำเร็จหรือไม่
 }
@@ -2197,6 +2198,168 @@ function parseBulkText(text) {
     }
 
     return parsedSubjects;
+}
+
+// ==========================================================================
+// CLASS NOTIFICATION SYSTEM (ระบบแจ้งเตือนวิชาเรียนล่วงหน้า)
+// ==========================================================================
+let notificationPermissionGranted = false;
+let notificationTimer = null;
+
+function initNotifications() {
+    const notifyToggle = document.getElementById('notify-toggle');
+    const notifySettingsGroup = document.getElementById('notify-settings-group');
+    const notifyLeadTimeSelect = document.getElementById('notify-lead-time');
+
+    if (!notifyToggle || !notifySettingsGroup || !notifyLeadTimeSelect) return;
+
+    // โหลดการตั้งค่าการแจ้งเตือนจาก LocalStorage
+    const isEnabled = localStorage.getItem('notify_enabled') === 'true';
+    const leadTime = localStorage.getItem('notify_lead_time') || '10';
+
+    notifyToggle.checked = isEnabled;
+    notifyLeadTimeSelect.value = leadTime;
+    notifySettingsGroup.style.display = isEnabled ? 'flex' : 'none';
+
+    if (isEnabled && 'Notification' in window) {
+        if (Notification.permission === 'granted') {
+            notificationPermissionGranted = true;
+            startNotificationCheckTimer();
+        } else {
+            // หากสิทธิ์แจ้งเตือนหายไป ให้ปิดสวิตช์ในหน้า UI
+            localStorage.setItem('notify_enabled', 'false');
+            notifyToggle.checked = false;
+            notifySettingsGroup.style.display = 'none';
+        }
+    }
+
+    // อีเวนต์เปิด/ปิดการแจ้งเตือน
+    notifyToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            if (!('Notification' in window)) {
+                alert('⚠️ เบราว์เซอร์ของคุณไม่รองรับระบบการแจ้งเตือน Web Notification ครับ');
+                e.target.checked = false;
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    notificationPermissionGranted = true;
+                    localStorage.setItem('notify_enabled', 'true');
+                    notifySettingsGroup.style.display = 'flex';
+                    startNotificationCheckTimer();
+                    showToast('🔔 เปิดใช้งานการแจ้งเตือนวิชาเรียนแล้ว!');
+                    
+                    // ทดสอบส่งการแจ้งเตือนทดลอง
+                    new Notification('ระบบแจ้งเตือนตารางเรียน ⏰', {
+                        body: 'เปิดสิทธิ์การแจ้งเตือนสำเร็จ! ระบบจะส่งแจ้งเตือนเมื่อใกล้ถึงเวลาคาบเรียนของคุณ',
+                        icon: './logo.svg'
+                    });
+                } else {
+                    alert('⚠️ ไม่สามารถแจ้งเตือนได้เนื่องจากสิทธิ์แจ้งเตือนถูกปฏิเสธ\n\nกรุณากดอนุญาตให้ส่งการแจ้งเตือนที่แถบตั้งค่าเว็บไซต์ของเบราว์เซอร์ครับ');
+                    e.target.checked = false;
+                    localStorage.setItem('notify_enabled', 'false');
+                    notifySettingsGroup.style.display = 'none';
+                    stopNotificationCheckTimer();
+                }
+            });
+        } else {
+            localStorage.setItem('notify_enabled', 'false');
+            notifySettingsGroup.style.display = 'none';
+            stopNotificationCheckTimer();
+            showToast('🔕 ปิดระบบแจ้งเตือนวิชาเรียนแล้ว');
+        }
+    });
+
+    // อีเวนต์เปลี่ยนช่วงเวลาแจ้งเตือนล่วงหน้า
+    notifyLeadTimeSelect.addEventListener('change', (e) => {
+        localStorage.setItem('notify_lead_time', e.target.value);
+        showToast(`⏰ ปรับเวลาแจ้งเตือนล่วงหน้าเป็น ${e.target.value} นาที`);
+        
+        // เคลียร์ประวัติแจ้งเตือนวันนี้ชั่วคราวเพื่อใช้ค่าเวลาเตือนใหม่ในการคำนวณรอบถัดไป
+        sessionStorage.removeItem('notified_subject_ids');
+    });
+}
+
+function startNotificationCheckTimer() {
+    if (notificationTimer) clearInterval(notificationTimer);
+    
+    // สแกนตรวจสอบเวลาทันที และสแกนใหม่ทุก 30 วินาที
+    checkClassNotifications();
+    notificationTimer = setInterval(checkClassNotifications, 30000);
+}
+
+function stopNotificationCheckTimer() {
+    if (notificationTimer) {
+        clearInterval(notificationTimer);
+        notificationTimer = null;
+    }
+}
+
+function checkClassNotifications() {
+    const isEnabled = localStorage.getItem('notify_enabled') === 'true';
+    if (!isEnabled || !notificationPermissionGranted || !('Notification' in window)) return;
+
+    const now = new Date();
+    const todayDateStr = now.toDateString(); // เช่น 'Sun Jun 14 2026'
+
+    // ดึงรายชื่อวิชาที่แจ้งเตือนสำเร็จแล้ววันนี้จาก sessionStorage ป้องกันการเตือนซ้ำเวลาเปิดแถบเบราว์เซอร์ใหม่
+    let notifiedData = {};
+    try {
+        const rawData = sessionStorage.getItem('notified_subject_ids');
+        if (rawData) notifiedData = JSON.parse(rawData);
+    } catch (e) {
+        console.error('Error parsing notified list:', e);
+    }
+
+    // รีเซ็ตล้างวิชาที่เตือนไปแล้วถ้าวันเปลี่ยนไป
+    if (notifiedData.date !== todayDateStr) {
+        notifiedData = {
+            date: todayDateStr,
+            ids: []
+        };
+    }
+
+    const activeSch = getActiveSchedule();
+    if (!activeSch || !activeSch.subjects || activeSch.subjects.length === 0) return;
+
+    const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const currentDayNameEn = englishDays[now.getDay()];
+    
+    const leadTimeMinutes = parseInt(localStorage.getItem('notify_lead_time') || '10', 10);
+    const todaySubjects = activeSch.subjects.filter(sub => sub.day === currentDayNameEn);
+
+    todaySubjects.forEach(sub => {
+        // หากแจ้งเตือนวิชานี้ไปแล้ววันนี้ ข้ามไป
+        if (notifiedData.ids.includes(sub.id)) return;
+
+        const [startH, startM] = sub.startTime.split(':').map(Number);
+        const startTimeDate = new Date(now);
+        startTimeDate.setHours(startH, startM, 0, 0);
+
+        const diffMs = startTimeDate.getTime() - now.getTime();
+        const diffMinutes = Math.floor(diffMs / 60000);
+
+        // หากกำลังจะเริ่มเรียนล่วงหน้าอยู่ในช่วง 0 ถึงจำนวนนาทีเตือนล่วงหน้าที่ตั้งไว้
+        if (diffMinutes >= 0 && diffMinutes <= leadTimeMinutes) {
+            const minutesLabel = diffMinutes === 0 ? 'กำลังจะเริ่มขึ้นในขณะนี้!' : `ในอีก ${diffMinutes} นาที`;
+            
+            try {
+                new Notification(`⏰ คาบเรียนถัดไปของคุณ (${sub.subjectCode})`, {
+                    body: `วิชา: ${sub.subjectName}\nเวลาเรียน: ${sub.startTime} - ${sub.endTime} น.\nห้องเรียน: ${sub.room || 'ไม่ระบุห้องเรียน'}\nผู้สอน: ${sub.teacher || 'ไม่ระบุ'}`,
+                    icon: './logo.svg',
+                    tag: sub.id, // ป้องกันกล่อง Pop-up เด้งซ้ำตัวเดิม
+                    requireInteraction: true // ให้กล่องเตือนค้างไว้จนกว่าผู้ใช้จะกดปิดหรือตอบรับ
+                });
+
+                // บันทึกรายวิชาลงลิสต์แจ้งเตือนแล้วเพื่อป้องกันการแจ้งเตือนซ้ำในรอบสแกนวินาทีถัดไป
+                notifiedData.ids.push(sub.id);
+                sessionStorage.setItem('notified_subject_ids', JSON.stringify(notifiedData));
+            } catch (e) {
+                console.error('Failed to trigger native Notification:', e);
+            }
+        }
+    });
 }
 
 
