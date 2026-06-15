@@ -69,8 +69,44 @@ function applySavedTheme() {
     });
 }
 
+// ฟังก์ชันตรวจสอบและนำเข้าวิชาเรียนจาก URL
+function checkUrlImports() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const importData = urlParams.get('add-subject');
+    if (importData) {
+        try {
+            // ถอดรหัส Base64 UTF-8 อย่างปลอดภัย
+            const jsonStr = decodeURIComponent(escape(atob(importData)));
+            const subject = JSON.parse(jsonStr);
+            
+            // เปลี่ยน ID ใหม่เพื่อป้องกันสับสน
+            subject.id = 'sub_' + Date.now();
+            
+            // ถามผู้ใช้อีกครั้งเพื่อความมั่นใจ
+            setTimeout(() => {
+                const confirmImport = confirm(`คุณต้องการนำเข้าวิชาเรียน "${subject.subjectCode || ''} ${subject.subjectName}" เข้าตารางเรียนของคุณใช่หรือไม่?`);
+                if (confirmImport) {
+                    const activeSch = getActiveSchedule();
+                    if (activeSch) {
+                        activeSch.subjects.push(subject);
+                        saveSchedules();
+                        render();
+                        showToast(`✅ นำเข้าวิชาเรียน "${subject.subjectName}" สำเร็จแล้ว!`);
+                    }
+                }
+                // ล้าง URL parameter เพื่อความสะอาดและกันสับสนเมื่อเปิดซ้ำ
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }, 300);
+        } catch (e) {
+            console.error('Failed to import subject from URL:', e);
+        }
+    }
+}
+
 function initApp() {
     loadSchedules();
+    checkUrlImports();
     updateClock();
     setInterval(updateClock, 1000);
 
@@ -624,6 +660,7 @@ function createSubjectCard(sub, index) {
 
     // จัดวางวิชาเรียนกรณีมีเวลาเรียนชนกัน
     if (sub.totalTracks && sub.totalTracks > 1) {
+        card.classList.add('clashed');
         card.style.position = 'absolute';
         card.style.margin = '0';
         if (gridOrientation === 'horizontal') {
@@ -671,6 +708,9 @@ function createSubjectCard(sub, index) {
         </div>
         
         <div class="card-actions">
+            <button class="btn-card-action btn-share" title="แชร์วิชานี้ไปยังบัญชี/เครื่องอื่น">
+                <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+            </button>
             <button class="btn-card-action btn-copy" title="คัดลอกวิชานี้">
                 <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
             </button>
@@ -684,6 +724,11 @@ function createSubjectCard(sub, index) {
     `;
 
     // ผูก Events
+    card.querySelector('.btn-share').addEventListener('click', (e) => {
+        e.stopPropagation();
+        shareSubject(sub.id);
+    });
+
     card.querySelector('.btn-copy').addEventListener('click', (e) => {
         e.stopPropagation();
         copySubject(sub.id);
@@ -1477,6 +1522,34 @@ function copySubject(id) {
     showToast(`📋 คัดลอกวิชาเรียน "${sub.subjectCode || ''} ${sub.subjectName}" เรียบร้อยแล้ว`);
 }
 window.copySubject = copySubject;
+
+function shareSubject(id) {
+    const activeSch = getActiveSchedule();
+    if (!activeSch) return;
+
+    const sub = activeSch.subjects.find(s => s.id === id);
+    if (!sub) return;
+
+    try {
+        // เข้ารหัสข้อมูลวิชาเรียนเป็น Base64 UTF-8 อย่างปลอดภัย
+        const jsonStr = JSON.stringify(sub);
+        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?add-subject=${base64}`;
+        
+        // คัดลอกไปยัง Clipboard
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showToast('📋 คัดลอกลิงก์แชร์วิชาเรียนสำเร็จ! ส่งต่อให้เพื่อนหรือเปิดในบราวเซอร์อื่นได้ทันที');
+        }).catch(err => {
+            console.error('Failed to copy share link:', err);
+            // กรณีบราวเซอร์ไม่รองรับ Clipboard API ให้แสดง prompt
+            prompt('คัดลอกลิงก์แชร์วิชาเรียนด้านล่างนี้:', shareUrl);
+        });
+    } catch (e) {
+        console.error('Failed to generate share link:', e);
+        showToast('⚠️ เกิดข้อผิดพลาดในการสร้างลิงก์แชร์');
+    }
+}
+window.shareSubject = shareSubject;
 
 function deleteSubject(id) {
     const activeSch = getActiveSchedule();

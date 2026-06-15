@@ -910,6 +910,23 @@ body {
     box-shadow: 0 16px 28px -6px rgba(15, 23, 42, 0.08), 0 8px 16px -4px rgba(79, 70, 229, 0.08) !important;
 }
 
+/* เอฟเฟกต์การขยายการ์ดวิชาเรียนที่เวลาชนกันให้เด่นขึ้นเวลา Hover */
+.subject-card.clashed:hover {
+    z-index: 100 !important;
+}
+.timetable-grid.horizontal .subject-card.clashed:hover {
+    height: calc(100% - 6px) !important;
+    top: 3px !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 20px 35px rgba(15, 23, 42, 0.15) !important;
+}
+.timetable-grid.vertical .subject-card.clashed:hover {
+    width: calc(100% - 8px) !important;
+    left: 4px !important;
+    transform: scale(1.02);
+    box-shadow: 0 20px 35px rgba(15, 23, 42, 0.15) !important;
+}
+
 .subject-card:active {
     transform: scale(0.98) translateY(-2px);
 }
