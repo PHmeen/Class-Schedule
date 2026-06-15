@@ -24,7 +24,12 @@ const colorMap = {
     'emerald': 'emerald',
     'coral': 'coral',
     'amethyst': 'amethyst',
-    'amber': 'amber'
+    'amber': 'amber',
+    'rose': 'rose',
+    'sky': 'sky',
+    'teal': 'teal',
+    'violet': 'violet',
+    'sage': 'sage'
 };
 
 const dayColumnIndices = {
@@ -664,15 +669,15 @@ function createSubjectCard(sub, index) {
         card.style.position = 'absolute';
         card.style.margin = '0';
         if (gridOrientation === 'horizontal') {
+            card.style.width = 'calc(100% - 8px)';
+            card.style.left = '4px';
             card.style.height = `calc((100% / ${sub.totalTracks}) - 6px)`;
             card.style.top = `calc((${sub.track} / ${sub.totalTracks}) * 100% + 3px)`;
-            card.style.left = '4px';
-            card.style.right = '4px';
         } else {
+            card.style.height = 'calc(100% - 6px)';
+            card.style.top = '3px';
             card.style.width = `calc((100% / ${sub.totalTracks}) - 8px)`;
             card.style.left = `calc((${sub.track} / ${sub.totalTracks}) * 100% + 4px)`;
-            card.style.top = '3px';
-            card.style.bottom = '3px';
         }
     }
     
@@ -1534,7 +1539,8 @@ function shareSubject(id) {
         // เข้ารหัสข้อมูลวิชาเรียนเป็น Base64 UTF-8 อย่างปลอดภัย
         const jsonStr = JSON.stringify(sub);
         const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-        const shareUrl = `${window.location.origin}${window.location.pathname}?add-subject=${base64}`;
+        const baseHref = window.location.href.split('?')[0];
+        const shareUrl = `${baseHref}?add-subject=${base64}`;
         
         // คัดลอกไปยัง Clipboard
         navigator.clipboard.writeText(shareUrl).then(() => {

@@ -39,6 +39,26 @@
     --subject-amber-dark: #451a03; 
     --subject-amber-border: #d97706;
 
+    --subject-rose: #fff1f2;
+    --subject-rose-dark: #4c0519; 
+    --subject-rose-border: #fda4af;
+
+    --subject-sky: #f0f9ff;
+    --subject-sky-dark: #0c4a6e; 
+    --subject-sky-border: #0ea5e9;
+
+    --subject-teal: #f0fdfa;
+    --subject-teal-dark: #115e59; 
+    --subject-teal-border: #0d9488;
+
+    --subject-violet: #f5f3ff;
+    --subject-violet-dark: #4c1d95; 
+    --subject-violet-border: #7c3aed;
+
+    --subject-sage: #f4f7f4;
+    --subject-sage-dark: #2f4f2f; 
+    --subject-sage-border: #829f82;
+
     /* สีหลัก */
     --primary: #4f46e5;       
     --primary-hover: #4338ca; 
@@ -1044,6 +1064,61 @@ body {
     box-shadow: 0 12px 24px -8px rgba(217, 119, 6, 0.25), 0 4px 12px -4px rgba(217, 119, 6, 0.15) !important;
 }
 
+.card-rose { 
+    background-color: var(--subject-rose);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 241, 242, 0.94)); 
+    color: var(--subject-rose-dark); 
+    border: 1.5px solid var(--subject-rose-border); 
+}
+.card-rose:hover {
+    border-color: var(--subject-rose-border);
+    box-shadow: 0 12px 24px -8px rgba(253, 164, 175, 0.25), 0 4px 12px -4px rgba(253, 164, 175, 0.15) !important;
+}
+
+.card-sky { 
+    background-color: var(--subject-sky);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(240, 249, 255, 0.94)); 
+    color: var(--subject-sky-dark); 
+    border: 1.5px solid var(--subject-sky-border); 
+}
+.card-sky:hover {
+    border-color: var(--subject-sky-border);
+    box-shadow: 0 12px 24px -8px rgba(14, 165, 233, 0.25), 0 4px 12px -4px rgba(14, 165, 233, 0.15) !important;
+}
+
+.card-teal { 
+    background-color: var(--subject-teal);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(240, 253, 250, 0.94)); 
+    color: var(--subject-teal-dark); 
+    border: 1.5px solid var(--subject-teal-border); 
+}
+.card-teal:hover {
+    border-color: var(--subject-teal-border);
+    box-shadow: 0 12px 24px -8px rgba(13, 148, 136, 0.25), 0 4px 12px -4px rgba(13, 148, 136, 0.15) !important;
+}
+
+.card-violet { 
+    background-color: var(--subject-violet);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(245, 243, 255, 0.94)); 
+    color: var(--subject-violet-dark); 
+    border: 1.5px solid var(--subject-violet-border); 
+}
+.card-violet:hover {
+    border-color: var(--subject-violet-border);
+    box-shadow: 0 12px 24px -8px rgba(124, 58, 237, 0.25), 0 4px 12px -4px rgba(124, 58, 237, 0.15) !important;
+}
+
+.card-sage { 
+    background-color: var(--subject-sage);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(244, 247, 244, 0.94)); 
+    color: var(--subject-sage-dark); 
+    border: 1.5px solid var(--subject-sage-border); 
+}
+.card-sage:hover {
+    border-color: var(--subject-sage-border);
+    box-shadow: 0 12px 24px -8px rgba(130, 159, 130, 0.25), 0 4px 12px -4px rgba(130, 159, 130, 0.15) !important;
+}
+
 /* หัวการ์ด */
 .card-header-row {
     display: flex;
@@ -1514,6 +1589,11 @@ input:focus, select:focus {
 .color-coral { background-color: #ea580c; border-color: rgba(234, 88, 12, 0.2); }
 .color-amethyst { background-color: #9333ea; border-color: rgba(147, 51, 234, 0.2); }
 .color-amber { background-color: #d97706; border-color: rgba(217, 119, 6, 0.2); }
+.color-rose { background-color: #f43f5e; border-color: rgba(244, 63, 94, 0.2); }
+.color-sky { background-color: #0ea5e9; border-color: rgba(14, 165, 233, 0.2); }
+.color-teal { background-color: #0d9488; border-color: rgba(13, 148, 136, 0.2); }
+.color-violet { background-color: #7c3aed; border-color: rgba(124, 58, 237, 0.2); }
+.color-sage { background-color: #829f82; border-color: rgba(130, 159, 130, 0.2); }
 
 /* TOAST */
 .toast {
