@@ -325,6 +325,74 @@ function switchView(view) {
 }
 window.switchView = switchView;
 
+// ฟังก์ชันคำนวณการซ้อนทับของวิชาเรียนในวันเดียวกัน
+function calculateOverlaps(subjects) {
+    // กำหนดค่าเริ่มต้น
+    subjects.forEach(s => {
+        s.track = 0;
+        s.totalTracks = 1;
+    });
+
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    days.forEach(dayName => {
+        const daySubjects = subjects.filter(s => s.day === dayName).sort((a, b) => {
+            return timeToGridCol(a.startTime) - timeToGridCol(b.startTime);
+        });
+
+        const components = [];
+        daySubjects.forEach(sub => {
+            let joinedComponent = null;
+            for (const comp of components) {
+                if (comp.some(existingSub => {
+                    const aStart = timeToGridCol(existingSub.startTime);
+                    const aEnd = timeToGridCol(existingSub.endTime);
+                    const bStart = timeToGridCol(sub.startTime);
+                    const bEnd = timeToGridCol(sub.endTime);
+                    // ตรวจสอบว่ามีส่วนที่ซ้อนทับกันหรือไม่
+                    return !(aEnd <= bStart || bEnd <= aStart);
+                })) {
+                    if (!joinedComponent) {
+                        comp.push(sub);
+                        joinedComponent = comp;
+                    } else {
+                        joinedComponent.push(...comp);
+                        components.splice(components.indexOf(comp), 1);
+                    }
+                }
+            }
+            if (!joinedComponent) {
+                components.push([sub]);
+            }
+        });
+
+        components.forEach(comp => {
+            comp.sort((a, b) => timeToGridCol(a.startTime) - timeToGridCol(b.startTime));
+            const tracks = [];
+            comp.forEach(sub => {
+                const subStart = timeToGridCol(sub.startTime);
+                const subEnd = timeToGridCol(sub.endTime);
+                let assignedTrack = -1;
+                for (let t = 0; t < tracks.length; t++) {
+                    if (tracks[t] <= subStart) {
+                        assignedTrack = t;
+                        tracks[t] = subEnd;
+                        break;
+                    }
+                }
+                if (assignedTrack === -1) {
+                    tracks.push(subEnd);
+                    assignedTrack = tracks.length - 1;
+                }
+                sub.track = assignedTrack;
+            });
+            const totalTracks = tracks.length;
+            comp.forEach(sub => {
+                sub.totalTracks = totalTracks;
+            });
+        });
+    });
+}
+
 function renderWeeklyGrid() {
     const grid = document.getElementById('timetable-weekly-grid');
     if (!grid) return;
@@ -429,6 +497,9 @@ function renderWeeklyGrid() {
     // ดึงวิชาของตารางปัจจุบัน
     const activeSch = getActiveSchedule();
     const subjects = activeSch ? activeSch.subjects : [];
+
+    // คำนวณการชนกันของเวลาเรียนเพื่อจัดสรรตำแหน่งไม่ให้ซ้อนทับกัน
+    calculateOverlaps(subjects);
 
     // 4. วาดวิชาเรียนลงตามช่วงเวลาจริง
     if (subjects.length === 0) {
@@ -550,6 +621,23 @@ function createSubjectCard(sub, index) {
         card.style.gridColumn = `${cardIndex}`;
         card.style.gridRow = `${startVal} / ${endVal}`;
     }
+
+    // จัดวางวิชาเรียนกรณีมีเวลาเรียนชนกัน
+    if (sub.totalTracks && sub.totalTracks > 1) {
+        card.style.position = 'absolute';
+        card.style.margin = '0';
+        if (gridOrientation === 'horizontal') {
+            card.style.height = `calc((100% / ${sub.totalTracks}) - 6px)`;
+            card.style.top = `calc((${sub.track} / ${sub.totalTracks}) * 100% + 3px)`;
+            card.style.left = '4px';
+            card.style.right = '4px';
+        } else {
+            card.style.width = `calc((100% / ${sub.totalTracks}) - 8px)`;
+            card.style.left = `calc((${sub.track} / ${sub.totalTracks}) * 100% + 4px)`;
+            card.style.top = '3px';
+            card.style.bottom = '3px';
+        }
+    }
     
     card.setAttribute('data-id', sub.id);
     card.setAttribute('data-day', sub.day);
@@ -583,6 +671,9 @@ function createSubjectCard(sub, index) {
         </div>
         
         <div class="card-actions">
+            <button class="btn-card-action btn-copy" title="คัดลอกวิชานี้">
+                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            </button>
             <button class="btn-card-action btn-edit" title="แก้ไขข้อมูล">
                 <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
             </button>
@@ -593,6 +684,11 @@ function createSubjectCard(sub, index) {
     `;
 
     // ผูก Events
+    card.querySelector('.btn-copy').addEventListener('click', (e) => {
+        e.stopPropagation();
+        copySubject(sub.id);
+    });
+
     card.querySelector('.btn-edit').addEventListener('click', (e) => {
         e.stopPropagation();
         openEditModal(sub.id);
@@ -1361,6 +1457,26 @@ function createSchedule() {
     render();
     showToast(`📂 สร้างและเปิดตารางเรียนใหม่ "${newSch.name}" สำเร็จ!`);
 }
+
+function copySubject(id) {
+    const activeSch = getActiveSchedule();
+    if (!activeSch) return;
+
+    const sub = activeSch.subjects.find(s => s.id === id);
+    if (!sub) return;
+
+    // คัดลอกออบเจ็กต์วิชาเรียนและออก ID ใหม่
+    const copiedSubject = {
+        ...sub,
+        id: 'sub_' + Date.now()
+    };
+
+    activeSch.subjects.push(copiedSubject);
+    saveSchedules();
+    render();
+    showToast(`📋 คัดลอกวิชาเรียน "${sub.subjectCode || ''} ${sub.subjectName}" เรียบร้อยแล้ว`);
+}
+window.copySubject = copySubject;
 
 function deleteSubject(id) {
     const activeSch = getActiveSchedule();
