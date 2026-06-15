@@ -542,6 +542,20 @@ function renderWeeklyGrid() {
     // คำนวณการชนกันของเวลาเรียนเพื่อจัดสรรตำแหน่งไม่ให้ซ้อนทับกัน
     calculateOverlaps(subjects);
 
+    // ปรับความสูงของแถววันเรียนตามจำนวนการชนกันสูงสุดของวันนั้นๆ เพื่อไม่ให้การ์ดถูกบีบ
+    if (gridOrientation === 'horizontal') {
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const rowStyles = ['50px']; // แถวหัวตารางเวลา (50px)
+        days.forEach(dayName => {
+            const daySubjects = subjects.filter(s => s.day === dayName);
+            const maxTracks = daySubjects.reduce((max, s) => Math.max(max, s.totalTracks || 1), 1);
+            rowStyles.push(`minmax(${maxTracks * 85}px, auto)`);
+        });
+        grid.style.gridTemplateRows = rowStyles.join(' ');
+    } else {
+        grid.style.gridTemplateRows = ''; // รีเซ็ตสำหรับแนวตั้ง
+    }
+
     // 4. วาดวิชาเรียนลงตามช่วงเวลาจริง
     if (subjects.length === 0) {
         const emptyState = document.createElement('div');

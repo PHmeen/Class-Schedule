@@ -935,38 +935,9 @@ body {
     border-style: double; /* ขอบสองเส้นบ่งบอกถึงการทับซ้อนอย่างพรีเมียม */
 }
 
-/* ปรับสไตล์วิชาชนกันในแนวนอน (Horizontal Grid) ในสภาวะปกติและการเซฟรูป */
+/* ปรับสไตล์วิชาชนกันในแนวนอน (Horizontal Grid) ในสภาวะปกติและการเซฟรูป (ปัจจุบันไม่จำเป็นต้องย่อเป็นแถวเดี่ยวแล้วเนื่องจากแถวตารางขยายความสูงอัตโนมัติ) */
 .timetable-grid.horizontal .subject-card.clashed {
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 6px 10px !important;
-}
-.timetable-grid.horizontal .subject-card.clashed .card-header-row {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 6px !important;
-    width: auto !important;
-    flex-shrink: 0 !important;
-}
-.timetable-grid.horizontal .subject-card.clashed .card-time,
-.timetable-grid.horizontal .subject-card.clashed .card-code-badge {
-    padding: 2px 5px !important;
-    font-size: 0.72rem !important;
-}
-.timetable-grid.horizontal .subject-card.clashed .card-name {
-    font-size: 0.8rem !important;
-    font-weight: 700 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    display: block !important;
-    margin: 0 !important;
-    -webkit-line-clamp: unset !important;
-}
-.timetable-grid.horizontal .subject-card.clashed .card-details {
-    display: none !important; /* ซ่อนรายละเอียดแนวตั้งเพื่อไม่ให้ล้นในการแสดงผลปกติและการเซฟรูป */
+    /* ใช้สไตล์เดียวกับการ์ดปกติ แต่รักษาตำแหน่งการจัดเรียงไว้ */
 }
 
 /* เอฟเฟกต์การขยายการ์ดวิชาเรียนที่เวลาชนกันให้เด่นขึ้นเวลา Hover (เฉพาะบนเดสก์ท็อปที่รองรับการชี้เมาส์) */
@@ -974,28 +945,6 @@ body {
     .subject-card.clashed:hover {
         z-index: 100 !important;
         border-style: solid !important;
-    }
-    .timetable-grid.horizontal .subject-card.clashed:hover {
-        height: calc(100% - 6px) !important;
-        top: 3px !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 5px !important;
-        padding: 10px 12px !important;
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 20px 35px rgba(15, 23, 42, 0.15) !important;
-    }
-    .timetable-grid.horizontal .subject-card.clashed:hover .card-header-row {
-        width: 100% !important;
-        justify-content: space-between !important;
-    }
-    .timetable-grid.horizontal .subject-card.clashed:hover .card-name {
-        white-space: normal !important;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 2 !important;
-    }
-    .timetable-grid.horizontal .subject-card.clashed:hover .card-details {
-        display: flex !important;
     }
     .timetable-grid.vertical .subject-card.clashed:hover {
         width: calc(100% - 8px) !important;
